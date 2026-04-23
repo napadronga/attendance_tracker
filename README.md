@@ -1,5 +1,1 @@
-# attendance_tracker
-Student attendance tracker
-
-#to run both the frontend and the backend, just type
-'npm run dev'
+command i use to run /Applications/MAMP/Library/bin/mysql80/bin/mysql -u root -p -h 127.0.0.1 -P 3306

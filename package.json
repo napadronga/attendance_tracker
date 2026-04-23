@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon --watch server server/server.js",
-    "client": "npm start --prefix client",
+    "client": "PORT=3001 npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     
     "build": "npm run build --prefix client",

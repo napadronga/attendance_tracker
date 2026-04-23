@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const db = require("./db"); //db.js file to connect to the database
 
 const app = express();
 
@@ -11,6 +12,16 @@ app.use(express.json());
 //api route
 app.get("/api/data", (req, res) => {
   res.json({ message: "Hello from backend" });
+});
+
+//verifies the database connection
+app.get("/api/health", async (req, res) => {
+  try {
+    await db.query("SELECT 1");
+    res.json({ status: "ok", database: "connected" });
+  } catch (err) {
+    res.status(500).json({ status: "error", database: err.message });
+  }
 });
 
 //serve react build in production only
