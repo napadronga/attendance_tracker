@@ -1,0 +1,56 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+// Need to fetch from auth in backend
+
+function Login({ onLogin }){
+    const [role, setRole] = useState('student');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState ('');
+    const navigate = useNavigate();
+
+    function handleSubmit (e){
+        e.preventDefault();
+        const user = {
+            role,
+            name: role === 'teacher' ? 'TestTeacher' : 'TestStudent',
+            email: role === 'teacher' ? 'testteacher@123.com' : 'teststudent@123.com',
+        };
+        onLogin(user);
+        navigate(role === 'teacher' ? '/teacher/overview' : '/student/overview');
+
+        // fetch from auth here
+    }
+
+    return(
+        <div>
+            <div className="login">Login to view your attendance</div>
+            <div className="roleButtons">
+                <div onClick={() => setRole('student')}>Student</div>
+                <div onClick={() => setRole('teacher')}>Teacher</div>
+            </div>
+            <form onSubmit={handleSubmit}>
+                <div className='loginForm'>
+                    <label>Email</label>
+                    <input 
+                    type="text"
+                    placeholder="person123@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <div className='loginForm'>
+                    <label>Password</label>
+                    <input
+                    type="password"
+                    placeholder="password123"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+                <button type="submit" className="submitButton">Login</button>
+            </form>
+        </div>
+    );
+}
+export default Login;
