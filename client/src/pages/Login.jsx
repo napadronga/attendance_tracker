@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Need to fetch from auth in backend
+async function loginUser(email, password, role){
+    // FINISH THIS, send to auth
+    // Returns {user: {id, name, email, role}}
+    return {
+        user: {
+            role,
+            name: role === 'teacher' ? 'TestTeacher' : 'TestStudent',
+            email: role === 'teacher' ? 'testteacher@123.com' : 'teststudent@123.com',
+        }
+    };
+}
 
 function Login({ onLogin }){
     const [role, setRole] = useState('student');
@@ -9,17 +19,11 @@ function Login({ onLogin }){
     const [password, setPassword] = useState ('');
     const navigate = useNavigate();
 
-    function handleSubmit (e){
+    async function handleSubmit (e){
         e.preventDefault();
-        const user = {
-            role,
-            name: role === 'teacher' ? 'TestTeacher' : 'TestStudent',
-            email: role === 'teacher' ? 'testteacher@123.com' : 'teststudent@123.com',
-        };
+        const {user} = await loginUser(email, password, role);
         onLogin(user);
         navigate(role === 'teacher' ? '/teacher/overview' : '/student/overview');
-
-        // fetch from auth here
     }
 
     return(
@@ -53,4 +57,5 @@ function Login({ onLogin }){
         </div>
     );
 }
+
 export default Login;
