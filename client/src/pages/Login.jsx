@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 async function loginUser(email, password, role){
-    // FINISH THIS, send to auth
+    // FINISH THIS, /api/auth/login
     // Returns {user: {id, name, email, role}}
     return {
         user: {
