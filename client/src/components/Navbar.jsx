@@ -14,6 +14,7 @@ function Navbar({ user, logout }) {
             <li><Link to="/teacher/overview">Overview</Link></li>
             <li><Link to="/teacher/mark">Mark Attendance</Link></li>
             <li><Link to="/teacher/history">Class History</Link></li>
+            <li><Link to="/teacher/excuses">Excuses</Link></li>
           </ul>
         ) : (
           <ul>

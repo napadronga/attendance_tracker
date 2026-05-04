@@ -33,6 +33,13 @@ function StudentAttendance({ user }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  async function loadAbsencesForActiveClass() {
+    if (!activeClass || !user?.id) return;
+
+    const data = await fetchAbsences(user.id, activeClass.id);
+    setAbsences(data);
+  }
+
   useEffect(() => {
     async function loadClasses() {
       try {
@@ -117,6 +124,7 @@ function StudentAttendance({ user }) {
       setExcuseId(null);
       setExcuse("");
       setSuccess("Excuse submitted successfully.");
+      await loadAbsencesForActiveClass();
     } catch (err) {
       setError(err.message || "Failed to submit excuse. Please try again.");
     } finally {
@@ -173,7 +181,9 @@ function StudentAttendance({ user }) {
               <tr>
                 <th>Date</th>
                 <th>Status</th>
-                <th>Excuse</th>
+                <th>Excuse Status</th>
+                <th>Reason</th>
+                <th>Action</th>
               </tr>
             </thead>
 
@@ -181,11 +191,40 @@ function StudentAttendance({ user }) {
               {absences.map((a) => (
                 <tr key={a.id}>
                   <td>{new Date(a.date).toLocaleDateString()}</td>
-                  <td>{a.status}</td>
+
                   <td>
-                    <button type="button" onClick={() => openExcuseForm(a.id)}>
-                      Add Excuse
-                    </button>
+                    <span className={`statusBadge ${a.status}`}>
+                      {a.status}
+                    </span>
+                  </td>
+
+                  <td>
+                    {a.excuseStatus ? (
+                      <span className={`statusBadge ${a.excuseStatus}`}>
+                        {a.excuseStatus}
+                      </span>
+                    ) : (
+                      <span className="statusBadge notSubmitted">
+                        Not submitted
+                      </span>
+                    )}
+                  </td>
+
+                  <td>{a.reason || "No excuse submitted"}</td>
+
+                  <td>
+                    {a.excuseStatus ? (
+                      <button type="button" disabled>
+                        Submitted
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openExcuseForm(a.id)}
+                      >
+                        Add Excuse
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

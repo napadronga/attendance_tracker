@@ -47,19 +47,24 @@ router.get("/classes/:classId/absences", async (req, res) => {
     }
 
     const [rows] = await db.query(
-      `
+        `
         SELECT 
-          id,
-          date,
-          status
-        FROM attendance
-        WHERE student_id = ?
-          AND class_id = ?
-          AND status IN ('absent', 'late', 'excused')
-        ORDER BY date DESC
+          a.id,
+          a.date,
+          a.status,
+          ae.reason,
+          ae.status AS excuseStatus,
+          ae.submitted_at AS excuseSubmittedAt
+        FROM attendance a
+        LEFT JOIN absence_excuses ae 
+          ON ae.attendance_id = a.id
+        WHERE a.student_id = ?
+          AND a.class_id = ?
+          AND a.status IN ('absent', 'late', 'excused')
+        ORDER BY a.date DESC
         `,
-      [studentId, classId]
-    );
+        [studentId, classId]
+      );
 
     res.json(rows);
   } catch (err) {
