@@ -2,7 +2,7 @@
 
 A web-based attendance management system built with React, Node.js, Express, and MySQL/MariaDB.
 
-Students can view attendance, see absences, and submit excuses. Teachers can view class statistics, mark students present or absent, and edit previous attendance records.
+Students can view attendance, see absences, submit absence excuses, and see whether an excuse is pending, approved, or rejected. Teachers can view class statistics, mark students present or absent, edit previous attendance records, and approve or reject student excuses.
 
 ---
 
@@ -37,6 +37,8 @@ Students can view attendance, see absences, and submit excuses. Teachers can vie
 - View minimum required attendance
 - View missed days
 - Submit an excuse for an absence
+- View excuse status: pending, approved, rejected, or not submitted
+- View updated attendance status such as absent or excused
 
 ### Teacher Features
 - Login as a teacher
@@ -47,7 +49,9 @@ Students can view attendance, see absences, and submit excuses. Teachers can vie
 - Submit attendance to the database
 - View previous attendance history
 - Edit previous attendance records
-- Attendance overview updates after records are changed
+- View student absence excuses
+- Approve or reject student excuses
+- Attendance overview updates after attendance records or excuses are changed
 
 ---
 
@@ -67,7 +71,8 @@ attendance_tracker
 │       │   ├── StudentAttendance.jsx
 │       │   ├── TeacherOverview.jsx
 │       │   ├── TeacherMark.jsx
-│       │   └── TeacherHistory.jsx
+│       │   ├── TeacherHistory.jsx
+│       │   └── TeacherExcuses.jsx
 │       ├── api.js
 │       ├── index.jsx
 │       └── index.css
@@ -83,7 +88,7 @@ attendance_tracker
 │   ├── seedUsers.js
 │   ├── seedDemoData.js
 │   ├── seedAttendance.js
-│   ├── attendance_db_export.sql
+│   ├── attendance_db.sql
 │   └── server.js
 ├── .env.example
 ├── package.json
@@ -193,7 +198,7 @@ http://localhost/phpmyadmin
 
 There are two options.
 
-Use **Option A** if you want the exact same demo database as I do.
+Use **Option A** if you want the exact same demo database as the original developer.
 
 Use **Option B** if you want a fresh database created with schema and seed scripts.
 
@@ -216,6 +221,7 @@ This SQL export includes:
 - enrollments
 - attendance records
 - attendance summaries
+- submitted excuses and their review statuses, if included in the export
 
 ### Steps
 
@@ -402,6 +408,8 @@ POST /api/teacher/classes/:classId/attendance
 GET /api/teacher/classes/:classId/history
 GET /api/teacher/classes/:classId/history/:date
 PUT /api/teacher/classes/:classId/history/:date
+GET /api/teacher/excuses?teacherId=2
+PUT /api/teacher/excuses/:excuseId
 ```
 
 ---
@@ -435,7 +443,81 @@ This means:
 
 ---
 
-## 16. Testing Checklist
+## 16. Excuse Workflow
+
+The excuse workflow connects the student side and teacher side.
+
+### Student submits an excuse
+
+When a student submits an excuse for an absence:
+
+```txt
+attendance.status = absent
+absence_excuses.status = pending
+```
+
+The student sees:
+
+```txt
+Attendance Status: Absent
+Excuse Status: Pending
+```
+
+### Teacher approves an excuse
+
+When a teacher approves an excuse:
+
+```txt
+attendance.status = excused
+absence_excuses.status = approved
+```
+
+The student sees:
+
+```txt
+Attendance Status: Excused
+Excuse Status: Approved
+```
+
+The teacher sees the same excuse record with an approved status.
+
+### Teacher rejects an excuse
+
+When a teacher rejects an excuse:
+
+```txt
+attendance.status = absent
+absence_excuses.status = rejected
+```
+
+The student sees:
+
+```txt
+Attendance Status: Absent
+Excuse Status: Rejected
+```
+
+### Attendance summary rule
+
+The system counts these statuses as attended:
+
+```txt
+present
+late
+excused
+```
+
+The system does not count this status as attended:
+
+```txt
+absent
+```
+
+Because of this, approving an excuse may increase the student's attendance percentage.
+
+---
+
+## 17. Testing Checklist
 
 ### Student Side
 
@@ -447,6 +529,9 @@ This means:
 - Student attendance page shows missed days
 - Student can submit an excuse
 - Blank excuse shows an error message
+- Student sees excuse status as pending after submitting
+- Student sees approved or rejected after teacher review
+- Student sees attendance status change to excused after approval
 - Logout works
 
 ### Teacher Side
@@ -463,11 +548,15 @@ This means:
 - Teacher history loads previous dates
 - Teacher can edit previous attendance records
 - Saving history updates attendance summary
+- Teacher can view submitted excuses
+- Teacher can approve or reject excuses
+- Approved excuses change attendance status to excused
+- Rejected excuses keep attendance status as absent
 - Logout works
 
 ---
 
-## 17. Registration Note
+## 18. Registration Note
 
 This project does not include public registration.
 
@@ -481,11 +570,10 @@ Future improvement:
 - Admin creates classes
 - Admin enrolls students into classes
 - Admin assigns teachers to classes
-(only if you want to continue this project)
 
 ---
 
-## 18. Common Problems and Fixes
+## 19. Common Problems and Fixes
 
 ### Access denied for user root
 
@@ -519,6 +607,32 @@ Check:
 - The selected role matches the account
 - `client/src/api.js` uses `http://localhost:5001`
 
+### Excuse is approved but still shows absent
+
+This means the `absence_excuses.status` was updated, but the matching `attendance.status` did not change to `excused`.
+
+Check the database:
+
+```sql
+SELECT 
+  ae.id AS excuse_id,
+  ae.attendance_id,
+  ae.status AS excuse_status,
+  a.id AS attendance_id,
+  a.date,
+  a.status AS attendance_status
+FROM absence_excuses ae
+JOIN attendance a ON ae.attendance_id = a.id
+ORDER BY a.date DESC;
+```
+
+For approved excuses, the expected result is:
+
+```txt
+excuse_status = approved
+attendance_status = excused
+```
+
 ### Recharts dependency error
 
 Inside the `client` folder, run:
@@ -531,7 +645,7 @@ npm start -- --force
 
 ---
 
-## 19. Current Project Status
+## 20. Current Project Status
 
 Connected core features:
 
@@ -539,9 +653,12 @@ Connected core features:
 - Student overview
 - Student absences
 - Student excuse submission
+- Student excuse status viewing
 - Teacher overview
 - Teacher mark attendance
 - Teacher attendance history
+- Teacher excuse review
+- Teacher excuse approval/rejection
 - Edit previous attendance
 - Attendance summary updates
 
@@ -550,19 +667,18 @@ Not included yet:
 - Public registration
 - Admin dashboard
 - JWT persistent login
-- Excuse approval/rejection
 - PDF reports
 - Email notifications
 
 ---
 
-## 20. Future Improvements
+## 21. Future Improvements
 
 Possible improvements:
 
 - Admin dashboard
 - Admin-controlled registration
-- Teacher approval or rejection of excuses
+- Teacher comments when rejecting excuses
 - Email notifications
 - JWT authentication
 - Persistent login after refresh
