@@ -198,7 +198,7 @@ http://localhost/phpmyadmin
 
 There are two options.
 
-Use **Option A** if you want the exact same demo database as the original developer.
+Use **Option A** if you want the exact same demo database as the original data.
 
 Use **Option B** if you want a fresh database created with schema and seed scripts.
 
@@ -570,7 +570,7 @@ Future improvement:
 - Admin creates classes
 - Admin enrolls students into classes
 - Admin assigns teachers to classes
-
+(if you want to continue the project)
 ---
 
 ## 19. Common Problems and Fixes
