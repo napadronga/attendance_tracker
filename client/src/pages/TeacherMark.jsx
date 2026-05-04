@@ -1,75 +1,106 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiRequest } from "../api";
 
-const CLASSES = [
-  { id: 1, name: "Biology" },
-  { id: 2, name: "English" },
-  { id: 3, name: "Math" },
-];
-
-const STUDENTS = [
-  {
-    id: 1,
-    classId: 1,
-    name: "Todd",
-    attendance: 35,
-    absences: 15,
-    email: "Todd@email.com",
-    status: true,
-  },
-  {
-    id: 2,
-    classId: 1,
-    name: "Jake",
-    attendance: 68,
-    absences: 7,
-    email: "Jake@email.com",
-    status: true,
-  },
-  {
-    id: 3,
-    classId: 2,
-    name: "Po",
-    attendance: 89,
-    absences: 3,
-    email: "Po@email.com",
-    status: true,
-  },
-];
-
-async function fetchStudents(classId) {
+async function fetchClasses(teacherId) {
   // FINISH THIS, /api/teacher/classes/{classId}/students
   // Return [{id, firstName, lastName, email}]
-  return [];
+  return apiRequest(`/api/teacher/classes?teacherId=${teacherId}`);
 }
 
-async function submitAttendance(classId, date, records) {
+async function fetchStudents(classId) {
+  return apiRequest(`/api/teacher/classes/${classId}/students`);
+}
+
+async function fetchAttendance(classId, date) {
+  return apiRequest(`/api/teacher/classes/${classId}/attendance?date=${date}`);
+}
+
+async function submitAttendance(classId, date, teacherId, records) {
   // FINISH THIS, /api/teacher/classes/{classId}/attendance
   // Body {date, records: [{studentId, status}]}
   // return true or false on success
-
-  console.log("Submitting attendance:", {
-    classId,
-    date,
-    records,
+  return apiRequest(`/api/teacher/classes/${classId}/attendance`, {
+    method: "POST",
+    body: JSON.stringify({
+      date,
+      teacherId,
+      records,
+    }),
   });
-
-  return true;
 }
 
-function TeacherMark() {
-  const [activeClass, setActiveClass] = useState(CLASSES[0]);
-  const [students, setStudents] = useState(STUDENTS);
+function TeacherMark({ user }) {
+  const [classes, setClasses] = useState([]);
+  const [activeClass, setActiveClass] = useState(null);
+  const [students, setStudents] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [loadingClasses, setLoadingClasses] = useState(true);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const filteredStudents = students.filter(
-    (student) => student.classId === activeClass.id
-  );
+  useEffect(() => {
+    async function loadClasses() {
+      try {
+        setLoadingClasses(true);
+        setError("");
 
-  const present = filteredStudents.filter((s) => s.status).length;
-  const absent = filteredStudents.length - present;
+        const data = await fetchClasses(user.id);
+
+        setClasses(data);
+
+        if (data.length > 0) {
+          setActiveClass(data[0]);
+        }
+      } catch (err) {
+        setError(err.message || "Could not load teacher classes.");
+      } finally {
+        setLoadingClasses(false);
+      }
+    }
+
+    if (user?.id) {
+      loadClasses();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    async function loadStudents() {
+      if (!activeClass) return;
+
+      try {
+        setLoadingStudents(true);
+        setSuccess("");
+        setError("");
+
+        const today = new Date().toISOString().split("T")[0];
+
+        const studentData = await fetchStudents(activeClass.id);
+        const attendanceData = await fetchAttendance(activeClass.id, today);
+
+        const attendanceMap = {};
+
+        attendanceData.forEach((record) => {
+          attendanceMap[record.studentId] = record.status;
+        });
+
+        const studentsWithStatus = studentData.map((student) => ({
+          ...student,
+          status: attendanceMap[student.id] === "absent" ? false : true,
+        }));
+
+        setStudents(studentsWithStatus);
+      } catch (err) {
+        setError(err.message || "Could not load students.");
+      } finally {
+        setLoadingStudents(false);
+      }
+    }
+
+    loadStudents();
+  }, [activeClass]);
 
   function handleClassChange(c) {
     setActiveClass(c);
@@ -77,7 +108,6 @@ function TeacherMark() {
     setError("");
   }
 
-  // Check for id from button and toggle it between absent or present
   function toggle(id) {
     setStudents((currentStudents) =>
       currentStudents.map((s) => {
@@ -92,31 +122,58 @@ function TeacherMark() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // Grab the date (YYYY-MM-DDHH:mm:ss:sssZ), cut off the second half and keep just the year,month,day
+
     setSuccess("");
     setError("");
 
-    if (filteredStudents.length === 0) {
-      setError(`No students found for ${activeClass.name}.`)
+    if (!activeClass) {
+      setError("No class selected.");
       return;
     }
-    try {
-      setLoading(true);
 
-      let date = new Date().toISOString();
-      date = date.split("T")[0];
-      const records = filteredStudents.map((s) => ({
+    if (students.length === 0) {
+      setError(`No students found for ${activeClass.name}.`);
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const date = new Date().toISOString().split("T")[0];
+
+      const records = students.map((s) => ({
         studentId: s.id,
         status: s.status ? "present" : "absent",
       }));
-      await submitAttendance(activeClass.id, date, records);
+
+      await submitAttendance(activeClass.id, date, user.id, records);
 
       setSuccess(`Attendance submitted for ${activeClass.name} on ${date}.`);
     } catch (err) {
-      setError("Failed to submit attendance. Please try again.");
+      setError(err.message || "Failed to submit attendance. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
+  }
+
+  const present = students.filter((s) => s.status).length;
+  const absent = students.length - present;
+
+  if (loadingClasses) {
+    return (
+      <main className="page">
+        <p>Loading teacher classes...</p>
+      </main>
+    );
+  }
+
+  if (!activeClass) {
+    return (
+      <main className="page">
+        <h2>Mark Attendance</h2>
+        <p className="emptyState">No classes found.</p>
+      </main>
+    );
   }
 
   return (
@@ -125,7 +182,7 @@ function TeacherMark() {
       <h3>Today: {new Date().toLocaleDateString()}</h3>
 
       <div>
-        {CLASSES.map((c) => (
+        {classes.map((c) => (
           <button
             key={c.id}
             type="button"
@@ -154,7 +211,9 @@ function TeacherMark() {
 
       <div className="studentTable">
         <form onSubmit={handleSubmit}>
-          {filteredStudents.length === 0 ? (
+          {loadingStudents ? (
+            <p>Loading students...</p>
+          ) : students.length === 0 ? (
             <p className="emptyState">
               No students found for {activeClass.name}.
             </p>
@@ -171,7 +230,7 @@ function TeacherMark() {
                 </thead>
 
                 <tbody>
-                  {filteredStudents.map((s) => (
+                  {students.map((s) => (
                     <tr key={s.id}>
                       <td>{s.name}</td>
                       <td>{s.email}</td>
@@ -187,12 +246,13 @@ function TeacherMark() {
               </table>
             </div>
           )}
+
           <button
             type="submit"
             className="submitButton"
-            disabled={loading || filteredStudents.length === 0}
+            disabled={submitting || loadingStudents || students.length === 0}
           >
-            {loading ? "Submitting..." : "Submit Attendance"}
+            {submitting ? "Submitting..." : "Submit Attendance"}
           </button>
         </form>
       </div>

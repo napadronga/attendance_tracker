@@ -1,113 +1,132 @@
-import { useState } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-const CLASSES = [
-  {
-    id: 1,
-    name: "Biology",
-    students: [
-      { id: 1, name: "Todd", attendancePct: 35, absences: 15 },
-      { id: 2, name: "Jake", attendancePct: 68, absences: 7 },
-    ],
-  },
-  {
-    id: 2,
-    name: "English",
-    students: [
-      { id: 1, name: "Po", attendancePct: 89, absences: 3 },
-      { id: 2, name: "Sarah", attendancePct: 92, absences: 2 },
-    ],
-  },
-  {
-    id: 3,
-    name: "Math",
-    students: [
-      { id: 1, name: "Mick", attendancePct: 45, absences: 13 },
-      { id: 2, name: "Alex", attendancePct: 78, absences: 5 },
-      { id: 3, name: "Noah", attendancePct: 26, absences: 11 },
-      { id: 4, name: "Dandy", attendancePct: 94, absences: 6 },
-    ],
-  },
-];
-const STUDENTS = [
-  {
-    id: 1,
-    name: "Todd",
-    attendancePct: 35,
-    absences: 15,
-    email: "Todd@email.com",
-  },
-  {
-    id: 2,
-    name: "Jake",
-    attendancePct: 68,
-    absences: 7,
-    email: "Jake@email.com",
-  },
-  { id: 3, name: "Po", attendancePct: 89, absences: 3, email: "Po@email.com" },
-];
+import { useEffect, useState } from "react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { apiRequest } from "../api";
 
 async function fetchClasses(teacherId) {
-  // FINISH THIS, /api/teacher/classes?teacherId={teacherId}
-  // Return classes
-  return [];
+  return apiRequest(`/api/teacher/classes?teacherId=${teacherId}`);
 }
 
-async function fetchOverview(classId) {
-  // FINISH THIS, /api/teacher/classes/{classId}/overview
-  // Return {totalStudents, students: [{id, name, attendancePct, absences}]
-  return [];
+async function fetchStudents(classId) {
+  return apiRequest(`/api/teacher/classes/${classId}/students`);
 }
 
-function TeacherOverview() {
-  const [activeClass, setActiveClass] = useState(CLASSES[0]);
+function TeacherOverview({ user }) {
+  const [classes, setClasses] = useState([]);
+  const [activeClass, setActiveClass] = useState(null);
+  const [students, setStudents] = useState([]);
 
-  // Fetch data here from backend, use fetch functinos add useEffect here for some aysnc function
+  const [loadingClasses, setLoadingClasses] = useState(true);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [error, setError] = useState("");
 
-  // Find avg attendance of class, loop through all students and add their att
-  const totalStudents = activeClass.students.length;
+  useEffect(() => {
+    async function loadClasses() {
+      try {
+        setLoadingClasses(true);
+        setError("");
+
+        const data = await fetchClasses(user.id);
+
+        setClasses(data);
+
+        if (data.length > 0) {
+          setActiveClass(data[0]);
+        }
+      } catch (err) {
+        setError(err.message || "Could not load teacher classes.");
+      } finally {
+        setLoadingClasses(false);
+      }
+    }
+
+    if (user?.id) {
+      loadClasses();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    async function loadStudents() {
+      if (!activeClass) return;
+
+      try {
+        setLoadingStudents(true);
+        setError("");
+
+        const data = await fetchStudents(activeClass.id);
+
+        setStudents(data);
+      } catch (err) {
+        setError(err.message || "Could not load students.");
+      } finally {
+        setLoadingStudents(false);
+      }
+    }
+
+    loadStudents();
+  }, [activeClass]);
+
+  if (loadingClasses) {
+    return (
+      <main className="page">
+        <p>Loading teacher classes...</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="page">
+        <p className="errorMessage">{error}</p>
+      </main>
+    );
+  }
+
+  if (!activeClass) {
+    return (
+      <main className="page">
+        <h2>Class Overview</h2>
+        <p className="emptyState">No classes found.</p>
+      </main>
+    );
+  }
+
+  const totalStudents = students.length;
 
   const avgAttendance =
     totalStudents > 0
-      ? activeClass.students.reduce((sum, student) => {
-          return sum + student.attendancePct;
+      ? students.reduce((sum, student) => {
+          return sum + Number(student.attendancePct);
         }, 0) / totalStudents
       : 0;
 
-  const lowAttendanceStudents = activeClass.students.filter(
-    (student) => student.attendancePct < 75
+  const lowAttendanceStudents = students.filter(
+    (student) => Number(student.attendancePct) < 75
   );
 
-  const excellentCount = activeClass.students.filter(
-    (student) => student.attendancePct >= 90
+  const excellentCount = students.filter(
+    (student) => Number(student.attendancePct) >= 90
   ).length;
 
-  const goodCount = activeClass.students.filter(
-    (student) => student.attendancePct >= 75 && student.attendancePct < 90
+  const goodCount = students.filter(
+    (student) =>
+      Number(student.attendancePct) >= 75 && Number(student.attendancePct) < 90
   ).length;
 
-  const warningCount = activeClass.students.filter(
-    (student) => student.attendancePct >= 60 && student.attendancePct < 75
+  const warningCount = students.filter(
+    (student) =>
+      Number(student.attendancePct) >= 60 && Number(student.attendancePct) < 75
   ).length;
 
-  const criticalCount = activeClass.students.filter(
-    (student) => student.attendancePct < 60
+  const criticalCount = students.filter(
+    (student) => Number(student.attendancePct) < 60
   ).length;
 
   const distributionData = [
-    { name: "Excellent 90-100%", value: excellentCount },
-    { name: "Good 75-89%", value: goodCount },
-    { name: "Warning 60-74%", value: warningCount },
-    { name: "Critical Below 60%", value: criticalCount },
+    { name: "Excellent 90-100%", value: excellentCount, color: "#15803d" },
+    { name: "Good 75-89%", value: goodCount, color: "#2563eb" },
+    { name: "Warning 60-74%", value: warningCount, color: "#ca8a04" },
+    { name: "Critical Below 60%", value: criticalCount, color: "#b91c1c" },
   ].filter((item) => item.value > 0);
-
-  const distributionColors = ["#15803d", "#2563eb", "#ca8a04", "#b91c1c"];
 
   function handleClassChange(c) {
     setActiveClass(c);
@@ -118,26 +137,28 @@ function TeacherOverview() {
       <h2>Class Overview</h2>
       <h3>Attendance for your classes</h3>
 
-      {CLASSES.length === 0 ? (
-        <p className="emptyState">No classes found.</p>
+      <div>
+        {classes.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className={activeClass.id === c.id ? "classTab active" : "classTab"}
+            onClick={() => handleClassChange(c)}
+          >
+            {c.name}
+          </button>
+        ))}
+      </div>
+
+      {loadingStudents ? (
+        <p>Loading students...</p>
       ) : (
         <>
-          <div>
-            {CLASSES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={
-                  activeClass.id === c.id ? "classTab active" : "classTab"
-                }
-                onClick={() => handleClassChange(c)}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-
-          {lowAttendanceStudents.length > 0 ? (
+          {students.length === 0 ? (
+            <p className="emptyState">
+              No students found for {activeClass.name}.
+            </p>
+          ) : lowAttendanceStudents.length > 0 ? (
             <p className="errorMessage">
               {lowAttendanceStudents.length} student
               {lowAttendanceStudents.length > 1 ? "s are" : " is"} below 75%
@@ -161,53 +182,55 @@ function TeacherOverview() {
             </div>
           </div>
 
-          <div className="chartCard">
-            <h3>Class Attendance Distribution</h3>
+          {students.length > 0 && (
+            <div className="chartCard">
+              <h3>Class Attendance Distribution</h3>
 
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={distributionData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={95}
-                  label
-                >
-                  {distributionData.map((entry, index) => (
-                    <Cell key={entry.name} fill={distributionColors[index]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={distributionData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={95}
+                    label
+                  >
+                    {distributionData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
 
-            <div className="chartLegend">
-              <span>
-                <span className="legendDot excellentDot"></span>
-                Excellent
-              </span>
+              <div className="chartLegend">
+                <span>
+                  <span className="legendDot excellentDot"></span>
+                  Excellent
+                </span>
 
-              <span>
-                <span className="legendDot goodDot"></span>
-                Good
-              </span>
+                <span>
+                  <span className="legendDot goodDot"></span>
+                  Good
+                </span>
 
-              <span>
-                <span className="legendDot warningDot"></span>
-                Warning
-              </span>
+                <span>
+                  <span className="legendDot warningDot"></span>
+                  Warning
+                </span>
 
-              <span>
-                <span className="legendDot criticalDot"></span>
-                Critical
-              </span>
+                <span>
+                  <span className="legendDot criticalDot"></span>
+                  Critical
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="students">
             <h2>Students</h2>
 
-            {activeClass.students.length === 0 ? (
+            {students.length === 0 ? (
               <p className="emptyState">
                 No students found for {activeClass.name}.
               </p>
@@ -216,16 +239,19 @@ function TeacherOverview() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Students</th>
+                      <th>Student</th>
+                      <th>Email</th>
                       <th>Attendance</th>
                       <th>Absences</th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    {activeClass.students.map((s) => (
+                    {students.map((s) => (
                       <tr key={s.id}>
                         <td>{s.name}</td>
-                        <td>{s.attendancePct}%</td>
+                        <td>{s.email}</td>
+                        <td>{Number(s.attendancePct).toFixed(1)}%</td>
                         <td>{s.absences}</td>
                       </tr>
                     ))}

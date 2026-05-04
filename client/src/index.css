@@ -1,18 +1,20 @@
 :root {
-  --bg: #f4f6f8;
+  --bg: #f6f4fb;
   --card: #ffffff;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --primary: #2c3947;
-  --primary-light: #41546a;
-  --accent: #2563eb;
+  --text: #1f1b2d;
+  --muted: #6f6a7c;
+  --primary: #6d28d9;
+  --primary-light: #ede9fe;
+  --accent: #7c3aed;
   --success: #15803d;
-  --danger: #b91c1c;
-  --warning: #ca8a04;
-  --border: #d1d5db;
-  --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  --radius: 14px;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --border: #e4ddf4;
+  --shadow: 0 12px 30px rgba(109, 40, 217, 0.1);
+  --radius: 18px;
 }
+
+/* Reset / Base */
 
 * {
   box-sizing: border-box;
@@ -38,9 +40,9 @@ button:disabled {
 
 main,
 .page {
-  max-width: 1100px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 28px;
+  padding: 34px;
 }
 
 /* Login */
@@ -57,8 +59,9 @@ main,
   max-width: 430px;
   background: var(--card);
   border-radius: var(--radius);
-  padding: 32px;
+  padding: 34px;
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .loginHeader {
@@ -67,11 +70,14 @@ main,
 }
 
 .loginHeader h1 {
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: var(--text);
 }
 
 .loginHeader p {
   color: var(--muted);
+  margin: 0;
 }
 
 .roleButtons {
@@ -83,10 +89,17 @@ main,
 .roleButton {
   flex: 1;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #e5e7eb;
   color: var(--text);
   font-weight: 700;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.roleButton:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .roleButton.active {
@@ -110,8 +123,16 @@ main,
 .excuseForm input {
   padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
+  background: white;
+}
+
+.loginForm input:focus,
+.excuseForm textarea:focus,
+.excuseForm input:focus {
+  outline: 3px solid var(--primary-light);
+  border-color: var(--primary);
 }
 
 /* Buttons */
@@ -119,27 +140,29 @@ main,
 .submitButton {
   width: 100%;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--accent);
   color: white;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 8px;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
 .submitButton:hover {
-  background: #1d4ed8;
+  background: #006ed6;
+  transform: translateY(-1px);
 }
 
 .smallButton {
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--primary);
   color: white;
   font-weight: 700;
 }
 
 .smallButton:hover {
-  background: var(--primary-light);
+  background: #006ed6;
 }
 
 /* Headings */
@@ -154,6 +177,18 @@ h3 {
   color: var(--muted);
 }
 
+.page h2 {
+  font-size: 30px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.page > h3 {
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
 /* Class Tabs */
 
 .classTabs,
@@ -161,20 +196,27 @@ h3 {
   padding: 10px 16px;
   margin: 8px 8px 16px 0;
   border-radius: 999px;
-  background: #e5e7eb;
-  color: var(--text);
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--muted);
   font-weight: 700;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .classTabs:hover,
 .classTab:hover {
-  background: #d1d5db;
+  background: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .classTabs.active,
 .classTab.active {
   background: var(--primary);
   color: white;
+  border-color: var(--primary);
+  box-shadow: 0 8px 18px rgba(11, 132, 255, 0.22);
 }
 
 /* Cards / Stats */
@@ -196,28 +238,34 @@ h3 {
 .avgAttendance,
 .totalStudents {
   background: var(--card);
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .classStats h3,
 .clasStats h3,
 .presentCount h3 {
   margin-top: 0;
+  font-size: 16px;
 }
 
 .classStats h2,
 .clasStats h2,
 .presentCount h2 {
   margin-bottom: 0;
+  font-size: 26px;
 }
+
+/* Charts */
 
 .chartCard {
   background: var(--card);
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   margin-top: 20px;
 }
 
@@ -228,6 +276,7 @@ h3 {
 .chartLegend {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 20px;
   margin-top: 12px;
   font-weight: 700;
@@ -245,16 +294,14 @@ h3 {
   border-radius: 50%;
 }
 
-.attendedDot {
-  background: #15803d;
-}
-
-.absentDot {
-  background: #b91c1c;
-}
-
+.attendedDot,
 .excellentDot {
   background: #15803d;
+}
+
+.absentDot,
+.criticalDot {
+  background: #b91c1c;
 }
 
 .goodDot {
@@ -265,20 +312,17 @@ h3 {
   background: #ca8a04;
 }
 
-.criticalDot {
-  background: #b91c1c;
-}
-
-/* Tables */
+/* Tables / Page Cards */
 
 .students,
 .studentTable,
 .editHistory,
 .excuseForm {
   background: var(--card);
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   margin-top: 20px;
 }
 
@@ -287,6 +331,7 @@ h3 {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   margin-top: 20px;
 }
 
@@ -309,15 +354,22 @@ th {
   color: var(--muted);
 }
 
+tr:last-child td {
+  border-bottom: none;
+}
+
 td button {
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--primary);
   color: white;
+  font-weight: 700;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
 td button:hover {
-  background: var(--primary-light);
+  background: #006ed6;
+  transform: translateY(-1px);
 }
 
 /* Messages */
@@ -326,7 +378,7 @@ td button:hover {
   background: #fee2e2;
   color: var(--danger);
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   margin: 12px 0;
 }
@@ -335,7 +387,7 @@ td button:hover {
   background: #dcfce7;
   color: var(--success);
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   margin: 12px 0;
 }
@@ -344,7 +396,7 @@ td button:hover {
   background: #fef3c7;
   color: #92400e;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   margin: 14px 0;
 }
@@ -362,16 +414,27 @@ td button:hover {
   resize: vertical;
 }
 
-.excuseForm div {
+.excuseForm div,
+.formActions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.excuseForm button {
+.excuseForm button,
+.formActions button {
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--primary);
   color: white;
+  font-weight: 700;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.excuseForm button:hover,
+.formActions button:hover {
+  background: #006ed6;
+  transform: translateY(-1px);
 }
 
 /* Responsive */
@@ -386,6 +449,10 @@ td button:hover {
     padding: 24px;
   }
 
+  .loginHeader h1 {
+    font-size: 28px;
+  }
+
   .roleButtons {
     flex-direction: column;
   }
@@ -395,7 +462,8 @@ td button:hover {
     padding: 10px;
   }
 
-  .excuseForm div {
+  .excuseForm div,
+  .formActions {
     flex-direction: column;
   }
 }

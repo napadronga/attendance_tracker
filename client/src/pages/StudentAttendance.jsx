@@ -1,167 +1,226 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { apiRequest } from "../api";
 
-const CLASSES = [
-    { id: 1, name: 'Biology'},
-    { id: 2, name: 'English'},
-    { id: 3, name: 'Math'},
-];
-
-const ABSENCES = [
-    { id: 1, classId: 1, date: '01-23-2026', status: 'absent' },
-    { id: 2, classId: 1, date: '01-27-2026', status: 'absent' },
-    { id: 3, classId: 2, date: '02-03-2026', status: 'absent' },
-];
-
-async function fetchAbsences(studentId, classId){
-    // FINISH THIS /api/student/classes/{classId}/absences
-    // Return [{id, date, status}]
-    return [];
+async function fetchClasses(studentId) {
+  return apiRequest(`/api/student/classes?studentId=${studentId}`);
 }
 
-async function submitExcuse(attendanceId, reason){
-    // FINISH THIS /api/student/absences/{attendanceId}/excuse
-    // Body {reason}
-    // Return true on success
-    console.log('Submitting excuse:', {
-        attendanceId,
-        reason,
-    });
-
-    return true;
+async function fetchAbsences(studentId, classId) {
+  return apiRequest(
+    `/api/student/classes/${classId}/absences?studentId=${studentId}`
+  );
 }
 
-function StudentAttendance(){
-    const [activeClass, setActiveClass] = useState(CLASSES[0]);
-    const [excuseId, setExcuseId] = useState(null);
-    const [excuse, setExcuse] = useState('');
+async function submitExcuse(attendanceId, reason) {
+  return apiRequest(`/api/student/absences/${attendanceId}/excuse`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
 
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [loading, setLoading] = useState(false);
+function StudentAttendance({ user }) {
+  const [classes, setClasses] = useState([]);
+  const [activeClass, setActiveClass] = useState(null);
+  const [absences, setAbsences] = useState([]);
 
-    const filteredAbsences = ABSENCES.filter(
-        (absence) => absence.classId === activeClass.id
-    );
+  const [excuseId, setExcuseId] = useState(null);
+  const [excuse, setExcuse] = useState("");
 
-    function openExcuseForm(absenceId){
-        setExcuseId(absenceId);
-        setExcuse('');
-        setError('');
-        setSuccess('');
+  const [loadingClasses, setLoadingClasses] = useState(true);
+  const [loadingAbsences, setLoadingAbsences] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    async function loadClasses() {
+      try {
+        setLoadingClasses(true);
+        setError("");
+
+        const data = await fetchClasses(user.id);
+        setClasses(data);
+
+        if (data.length > 0) {
+          setActiveClass(data[0]);
+        }
+      } catch (err) {
+        setError(err.message || "Could not load classes.");
+      } finally {
+        setLoadingClasses(false);
+      }
     }
 
-    function closeExcuseForm(){
+    if (user?.id) {
+      loadClasses();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    async function loadAbsences() {
+      if (!activeClass || !user?.id) return;
+
+      try {
+        setLoadingAbsences(true);
+        setError("");
+        setSuccess("");
         setExcuseId(null);
-        setExcuse('');
-        setError('');
-    }
-    async function handleExcuseSubmit(e) {
-        e.preventDefault();
+        setExcuse("");
 
-        setError('');
-        setSuccess('');
-
-        if (!excuse.trim()){
-            setError('Please enter an excuse before submitting');
-            return;
-        }
-
-        if(excuse.trim().length < 5){
-            setError('Excuse must be at least 5 characters long');
-            return;
-        }
-        try {
-            setLoading(true);
-            await submitExcuse(excuseId, excuse.trim());
-
-            setExcuseId(null);
-            setExcuse('');
-            setSuccess('Excuse submitted successfully');
-        }catch(error){
-            setError('Failed to submit excuse. Please try again.');
-        }finally{
-            setLoading(false);
-        }
+        const data = await fetchAbsences(user.id, activeClass.id);
+        setAbsences(data);
+      } catch (err) {
+        setError(err.message || "Could not load absences.");
+      } finally {
+        setLoadingAbsences(false);
+      }
     }
 
+    loadAbsences();
+  }, [user?.id, activeClass]);
+
+  function openExcuseForm(absenceId) {
+    setExcuseId(absenceId);
+    setExcuse("");
+    setError("");
+    setSuccess("");
+  }
+
+  function closeExcuseForm() {
+    setExcuseId(null);
+    setExcuse("");
+    setError("");
+  }
+
+  async function handleExcuseSubmit(e) {
+    e.preventDefault();
+
+    setError("");
+    setSuccess("");
+
+    if (!excuse.trim()) {
+      setError("Please enter an excuse before submitting.");
+      return;
+    }
+
+    if (excuse.trim().length < 5) {
+      setError("Excuse must be at least 5 characters long.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      await submitExcuse(excuseId, excuse.trim());
+
+      setExcuseId(null);
+      setExcuse("");
+      setSuccess("Excuse submitted successfully.");
+    } catch (err) {
+      setError(err.message || "Failed to submit excuse. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (loadingClasses) {
     return (
-        <main className="page">
-            <h2>Your Absences</h2>
-            <h3>View your absences for each class.</h3>
+      <main className="page">
+        <p>Loading classes...</p>
+      </main>
+    );
+  }
+
+  if (!activeClass) {
+    return (
+      <main className="page">
+        <h2>Your Absences</h2>
+        <p className="emptyState">No classes found.</p>
+      </main>
+    );
+  }
+
+  return (
+    <main className="page">
+      <h2>Your Absences</h2>
+      <h3>View your absences for each class.</h3>
+
+      <div>
+        {classes.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className={activeClass.id === c.id ? "classTab active" : "classTab"}
+            onClick={() => setActiveClass(c)}
+          >
+            {c.name}
+          </button>
+        ))}
+      </div>
+
+      {error && <p className="errorMessage">{error}</p>}
+      {success && <p className="successMessage">{success}</p>}
+
+      {loadingAbsences ? (
+        <p>Loading absences...</p>
+      ) : absences.length === 0 ? (
+        <p className="emptyState">No absences found for {activeClass.name}.</p>
+      ) : (
+        <div className="tableWrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Excuse</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {absences.map((a) => (
+                <tr key={a.id}>
+                  <td>{new Date(a.date).toLocaleDateString()}</td>
+                  <td>{a.status}</td>
+                  <td>
+                    <button type="button" onClick={() => openExcuseForm(a.id)}>
+                      Add Excuse
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {excuseId && (
+        <div className="excuseForm">
+          <h3>Add Excuse</h3>
+
+          <form onSubmit={handleExcuseSubmit}>
+            <label>Excuse</label>
+
+            <textarea
+              placeholder="Enter your excuse here"
+              value={excuse}
+              onChange={(e) => setExcuse(e.target.value)}
+            />
 
             <div>
-                {CLASSES.map(c => (
-                    <button 
-                        key={c.id} 
-                        type="button"
-                        className={activeClass.id === c.id ? 'classTab active' : 'classTab'} 
-                        onClick={() => setActiveClass(c)}
-                    >
-                        {c.name}
-                    </button>
-                ))}
+              <button type="button" onClick={closeExcuseForm}>
+                Cancel
+              </button>
+
+              <button type="submit" disabled={submitting}>
+                {submitting ? "Submitting..." : "Submit"}
+              </button>
             </div>
-
-            {error && <p className="errorMessage">{error}</p>}
-            {success && <p className="successMessage">{success}</p>}
-
-            {filteredAbsences.length === 0 ? (
-                <p className="emptyState">
-                    No absences found for {activeClass.name}.
-                </p>
-            ) :(
-                <div className="tableWrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Excuses</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {filteredAbsences.map((a) => (
-                                <tr key={a.id}>
-                                    <td>{a.date}</td>
-                                    <td>{a.status}</td>
-                                    <td>
-                                        <button type="button" onClick={() => openExcuseForm(a.id)}>
-                                            Add Excuse
-                                        </button>
-                                    </td>
-                                </tr>
-                                ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {excuseId && (
-                <div className="excuseForm">
-                    <h3>Add Excuse</h3>
-
-                    <form onSubmit={handleExcuseSubmit}>
-                        <label>Excuse</label>
-
-                            <textarea
-                                placeholder="Enter your excuse here"
-                                value={excuse}
-                                onChange={(e) => setExcuse(e.target.value)}
-                            />
-
-                            <div>
-                                <button type="button" onClick={closeExcuseForm}>Cancel</button>
-                                
-                                <button type="submit" disabled={loading}>
-                                    {loading ? 'Submitting...' : 'Submit'}
-                                </button>
-                            </div>
-                    </form>
-                </div>
-            )}
-    </main>   
-    );
+          </form>
+        </div>
+      )}
+    </main>
+  );
 }
 
 export default StudentAttendance;

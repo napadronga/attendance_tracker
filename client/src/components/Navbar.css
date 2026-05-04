@@ -1,38 +1,48 @@
 .navbar {
-  background: #2c3947;
-  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--card);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 28px;
-  gap: 20px;
+  padding: 16px 34px;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
 }
 
 .navbar h3 {
-  color: white;
   margin: 0;
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 800;
 }
 
 nav ul {
   display: flex;
+  align-items: center;
   list-style: none;
-  gap: 8px;
+  gap: 10px;
   padding: 0;
   margin: 0;
 }
 
 nav a {
-  padding: 8px 12px;
-  border-radius: 10px;
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
   font-size: 14px;
-  color: #e5e7eb;
+  color: var(--muted);
   text-decoration: none;
-  transition: background 0.15s, color 0.15s;
+  font-weight: 700;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 nav a:hover {
-  background: #41546a;
-  color: white;
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .user {
@@ -41,22 +51,32 @@ nav a:hover {
   gap: 12px;
 }
 
-.user button {
+.user h3 {
+  color: var(--text);
+  background: #f8fafc;
   padding: 8px 12px;
-  border-radius: 8px;
-  background: #ef4444;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.user button {
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--primary);
   color: white;
-  font-weight: 700;
+  font-weight: 800;
+  border: none;
 }
 
 .user button:hover {
-  background: #dc2626;
+  background: #006ed6;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 820px) {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
+    padding: 16px 20px;
   }
 
   nav ul {

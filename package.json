@@ -15,6 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.14",
     "recharts": "^3.8.1"

@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiRequest } from "../api";
+
+
 
 async function loginUser(email, password, role){
     // FINISH THIS, /api/auth/login
     // Returns {user: {id, name, email, role}}
-    return {
-        user: {
-            id: role === 'teacher' ? 1 : 2,
-            role,
-            name: role === 'teacher' ? 'TestTeacher' : 'TestStudent',
-            email,
-        }
-    };
+    return  apiRequest("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password, role }),
+    });
 }
 
 function Login({ onLogin }){
@@ -58,13 +57,17 @@ function Login({ onLogin }){
 
         try {
             setLoading(true);
-            const { user } = await loginUser(email, password, role);
+            const { user, token } = await loginUser(email, password, role);
+
+            if(token){
+                localStorage.setItem('token', token);
+            }
 
             onLogin(user);
 
             navigate(role === 'teacher' ? '/teacher/overview' : '/student/overview');
         } catch (err) {
-            setError('Login failed. Please check your credentials and try again.');
+            setError(err.message || 'Login failed. Please check your credentials and try again.');
         } finally {
             setLoading(false);
         }
