@@ -22,6 +22,7 @@ dist/
 server/.env
 client/.env
 
+
 # testing
 coverage/
 **/coverage/
