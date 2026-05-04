@@ -11,4 +11,29 @@ const STUDENTS = [
     {name: 'Jake', attendance: 68, absences: 7},
     {name: 'Po', attendance: 89, absences: 3}
 ];
-// not finished yet
+function TeacherHistory({ user }) {
+    const [selectedClass, setSelectedClass] = useState(CLASSES[0]);
+
+    return (
+        <div>
+            <h2>Attendance History</h2>
+            <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <h3>Past Classes</h3>
+            <ul>
+                {PAST_CLASSES.map((entry, i) => (
+                    <li key={i}>{entry.date} — Present: {entry.present}, Absent: {entry.absent}</li>
+                ))}
+            </ul>
+            <h3>Students</h3>
+            <ul>
+                {STUDENTS.map((s, i) => (
+                    <li key={i}>{s.name} — Attendance: {s.attendance}%, Absences: {s.absences}</li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+export default TeacherHistory;
