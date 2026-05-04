@@ -2,23 +2,18 @@ import { useState } from 'react';
 
 const CLASSES = [
     {id: 1, name: 'Biology', students: [
-        {id: 1, name: 'Todd', attendancePct: 35, absences: 15},
-        {id: 2, name: 'Jake', attendancePct: 68, absences: 7}
+        {id: 1, name: 'Todd', email: 'Todd@email.com', attendancePct: 35, absences: 15},
+        {id: 2, name: 'Jake', email: 'Jake@email.com', attendancePct: 68, absences: 7}
     ]},
     {id: 2, name: 'English', students: [
-        {id: 1, name: 'Po', attendancePct: 89, absences: 3},
-        {id: 2, name: 'Sarah', attendancePct: 92, absences: 2}
+        {id: 1, name: 'Po', email: 'Po@email.com', attendancePct: 89, absences: 3},
+        {id: 2, name: 'Sarah', email: 'Sarah@email.com', attendancePct: 92, absences: 2}
     ]},
     {id: 3, name: 'Math', students: [
-        {id: 1, name: 'Mick', attendancePct: 45, absences: 13},
-        {id: 2, name: 'Alex', attendancePct: 78, absences: 5}
+        {id: 1, name: 'Mick', email: 'Mick@email.com', attendancePct: 45, absences: 13},
+        {id: 2, name: 'Alex', email: 'Alex@email.com', attendancePct: 78, absences: 5}
     ]}
 ]
-const STUDENTS = [
-    {id: 1, name: 'Todd', attendancePct: 35, absences: 15, email: "Todd@email.com"},
-    {id: 2, name: 'Jake', attendancePct: 68, absences: 7, email: "Jake@email.com"},
-    {id: 3, name: 'Po', attendancePct: 89, absences: 3, email: "Po@email.com"}
-];
 
 async function fetchClasses(teacherId){
     // FINISH THIS, /api/teacher/classes?teacherId={teacherId}
@@ -47,8 +42,7 @@ function TeacherOverview(){
 
     return(
         <div>
-            <h2>Class Overview</h2>
-            <h3>Attendance for your classes</h3>
+            <h2>Overview for {activeClass.name}</h2>
 
             <div>
                 {CLASSES.map(c => (
@@ -56,12 +50,12 @@ function TeacherOverview(){
                 ))}
             </div>
 
-            <div className="clasStats">
-                <div className="avgAttendance">
+            <div className="classStats">
+                <div>
                     <h3>Average Attendance</h3>
-                    <h2>{avgAttendance}%</h2>
+                    <h2>{avgAttendance.toFixed(0)}%</h2>
                 </div>
-                <div className="totalStudents">
+                <div>
                     <h3>Total Students</h3>
                     <h2>{activeClass.students.length}</h2>
                 </div>

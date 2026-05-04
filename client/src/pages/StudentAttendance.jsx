@@ -40,7 +40,6 @@ function StudentAttendance(){
     return (
         <div>
             <h2>Your Absences</h2>
-            <h3>View your absences</h3>
 
             <div>
                 {CLASSES.map(c => (
@@ -71,7 +70,6 @@ function StudentAttendance(){
 
             {excuseId && (
                 <div className="excuseForm">
-                    <h3>Add Excuse</h3>
                     <form onSubmit={handleExcuseSubmit}>
                         <label>Excuse</label>
                             <input

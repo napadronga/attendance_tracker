@@ -19,8 +19,7 @@ function StudentOverview(){
 
     return(
         <div>
-            <h2>Attendance</h2>
-            <h3>Overview of your classes</h3>
+            <h2>Overview of {activeClass.name}</h2>
 
             <div>
                 {CLASSES.map(c => (
@@ -31,7 +30,7 @@ function StudentOverview(){
             <div className="classStats">
                 <div>
                     <h3>Attendance Rate</h3>
-                    <h2>{attendancePct.toFixed(1)}%</h2>
+                    <h2>{attendancePct.toFixed(0)}%</h2>
                 </div>
                 <div>
                     <h3>Classes Attended</h3>

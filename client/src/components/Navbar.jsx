@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import './Navbar.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function NavBar({ user, logOut }) {
     return (
     <header className="navbar">
-        <h3>Attendance</h3>
+        <h2>Attendance App</h2>
         <nav>
         {user.role === 'teacher' ? (
             <ul>
@@ -14,15 +14,15 @@ function NavBar({ user, logOut }) {
             </ul>
         ) : (
             <ul>
-            <li><Link to="/student/overview">My Attendance</Link></li>
-            <li><Link to="/student/attendance">Attendance</Link></li>
+            <li><Link to="/student/overview">Attendance</Link></li>
+            <li><Link to="/student/attendance">Abscences</Link></li>
             </ul>
         )}
         </nav>
         
         <div className="user">
-        <h3>{user.name}</h3>
-        <button onClick={logOut}>LogOut</button>
+            <h3>{user.name}</h3>
+            <button onClick={logOut}>LogOut</button>
         </div>
     </header>
     );

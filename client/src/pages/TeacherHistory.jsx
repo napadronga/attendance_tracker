@@ -1,16 +1,34 @@
 import { useState } from 'react';
 
-const CLASSES = ['Biology', 'English', 'Math'];
-const STUDENTS = [
-    {id: 1, name: 'Todd', attendancePct: 35, absences: 15, status: true},
-    {id: 2, name: 'Jake', attendancePct: 68, absences: 7, status: true},
-    {id: 3, name: 'Po', attendancePct: 89, absences: 3, status: true}
-];
-const PAST_CLASSES = [
-    {date: '01-23-2026', present: 15, absent: 5},
-    {date: '01-27-2026', present: 10, absent: 10},
-    {date: '01-29-2026', present: 17, absent: 3}
-];
+const CLASSES = [
+    {id: 1, name: 'Biology', 
+        students: [
+            {id: 1, name: 'Todd', email: 'Todd@email.com', attendancePct: 35, absences: 15},
+            {id: 2, name: 'Jake', email: 'Jake@email.com', attendancePct: 68, absences: 7}
+    ],
+        history: [
+                {date: '01-23-2026', present: 15, absent: 5},
+                {date: '01-27-2026', present: 10, absent: 10}
+    ]},
+    {id: 2, name: 'English', 
+        students: [
+            {id: 1, name: 'Po', email: 'Po@email.com', attendancePct: 89, absences: 3},
+            {id: 2, name: 'Sarah', email: 'Sarah@email.com', attendancePct: 92, absences: 2}
+    ],
+        history: [
+            {date: '05-21-2026', present: 18, absent: 2},
+            {date: '07-22-2026', present: 19, absent: 1}
+    ]},
+    {id: 3, name: 'Math', 
+        students: [
+            {id: 1, name: 'Mick', email: 'Mick@email.com', attendancePct: 45, absences: 13},
+            {id: 2, name: 'Alex', email: 'Alex@email.com', attendancePct: 78, absences: 5}
+    ],
+        history: [
+            {date: '02-5-2026', present: 5, absent: 15},
+            {date: '03-2-2026', present: 11, absent: 9}
+    ]}
+]
 
 async function fetchHistory(classId){
     // FINISH THIS, /api/teacher/classes/{classId}/history
@@ -34,7 +52,12 @@ async function saveSession(classId, date, records){
 function TeacherHistory(){
     const [activeClass, setActiveClass] = useState(CLASSES[0]);
     const [edit, setEdit] = useState(null);
-    const [students, setStudents] = useState(STUDENTS);
+    const [students, setStudents] = useState(CLASSES[0].students.map(s => ({...s, status: true})));
+
+    function handleClassChange(c){
+        setActiveClass(c);
+        setStudents(c.students.map(s => ({...s, status:true})));
+    }
 
     function toggle(id){
         setStudents(students.map(s => {
@@ -60,7 +83,7 @@ function TeacherHistory(){
 
             <div>
                 {CLASSES.map(c => (
-                    <button key={c} onClick={() => setActiveClass(c)}>{c}</button>
+                    <button key={c.id} className="classTabs" onClick={() => handleClassChange(c)}>{c.name}</button>
                 ))}
             </div>
 
@@ -75,7 +98,7 @@ function TeacherHistory(){
                     </tr>
                 </thead>
                 <tbody>
-                    {PAST_CLASSES.map((d, index) => (
+                    {activeClass.history.map((d, index) => (
                         <tr key={index}>
                             <td>{d.date}</td>
                             <td>{d.present}</td>
@@ -89,7 +112,7 @@ function TeacherHistory(){
 
             {edit && (
                 <div className="editHistory">
-                    <h3>Edit {edit.date}</h3>
+                    <h3>Editing {edit.date}</h3>
                     <table>
                         <thead>
                             <tr>
@@ -112,7 +135,7 @@ function TeacherHistory(){
                             ))}
                         </tbody>
                     </table>
-                    <div>
+                    <div className="editButtons">
                         <button onClick={() => setEdit(null)}>Cancel</button>
                         <button onClick={handleSave}>Save</button>
                     </div>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 async function loginUser(email, password, role){
-    // FINISH THIS, /api/auth/login
+    // FINISH THIS, send to auth
     // Returns {user: {id, name, email, role}}
     return {
         user: {
@@ -27,33 +27,35 @@ function Login({ onLogin }){
     }
 
     return(
-        <div>
-            <div className="login">Login to view your attendance</div>
-            <div className="roleButtons">
-                <div onClick={() => setRole('student')}>Student</div>
-                <div onClick={() => setRole('teacher')}>Teacher</div>
+        <div className="loginOuterDiv">
+            <div>
+                <h2 className="loginTitle">Log in to view your attendance</h2>
+                <div className="roleButtons">
+                    <button onClick={() => setRole('student')}>Student</button>
+                    <button onClick={() => setRole('teacher')}>Teacher</button>
+                </div>
+                <form onSubmit={handleSubmit}>
+                    <div className='loginForm'>
+                        <label>Email</label>
+                        <input className = "loginInput"
+                        type="text"
+                        placeholder="person123@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className='loginForm'>
+                        <label>Password</label>
+                        <input className = "loginInput"
+                        type="password"
+                        placeholder="password123"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    <button type="submit" className="submitButton">Log in</button>
+                </form>
             </div>
-            <form onSubmit={handleSubmit}>
-                <div className='loginForm'>
-                    <label>Email</label>
-                    <input 
-                    type="text"
-                    placeholder="person123@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div className='loginForm'>
-                    <label>Password</label>
-                    <input
-                    type="password"
-                    placeholder="password123"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <button type="submit" className="submitButton">Login</button>
-            </form>
         </div>
     );
 }

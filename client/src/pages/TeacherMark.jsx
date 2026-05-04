@@ -1,11 +1,19 @@
 import { useState } from 'react';
 
-const CLASSES = ['Biology', 'English', 'Math'];
-const STUDENTS = [
-    {id: 1, name: 'Todd', attendance: 35, absences: 15, email: "Todd@email.com", status: true},
-    {id: 2, name: 'Jake', attendance: 68, absences: 7, email: "Jake@email.com", status: true},
-    {id: 3, name: 'Po', attendance: 89, absences: 3, email: "Po@email.com", status: true}
-];
+const CLASSES = [
+    {id: 1, name: 'Biology', students: [
+        {id: 1, name: 'Todd', email: 'Todd@email.com', attendancePct: 35, absences: 15},
+        {id: 2, name: 'Jake', email: 'Jake@email.com', attendancePct: 68, absences: 7}
+    ]},
+    {id: 2, name: 'English', students: [
+        {id: 1, name: 'Po', email: 'Po@email.com', attendancePct: 89, absences: 3},
+        {id: 2, name: 'Sarah', email: 'Sarah@email.com', attendancePct: 92, absences: 2}
+    ]},
+    {id: 3, name: 'Math', students: [
+        {id: 1, name: 'Mick', email: 'Mick@email.com', attendancePct: 45, absences: 13},
+        {id: 2, name: 'Alex', email: 'Alex@email.com', attendancePct: 78, absences: 5}
+    ]}
+]
 
 async function fetchStudents(classId){
     // FINISH THIS, /api/teacher/classes/{classId}/students
@@ -22,7 +30,7 @@ async function submitAttendance(classId, date, records){
 
 function TeacherMark(){
     const [activeClass, setActiveClass] = useState(CLASSES[0]);
-    const [students, setStudents] = useState(STUDENTS);
+    const [students, setStudents] = useState(CLASSES[0].students.map(s => ({...s, status: true})));
 
     // Check for id from button and toggle it between absent or present
     function toggle(id){
@@ -33,7 +41,13 @@ function TeacherMark(){
             return s;
         }))
     }
-    
+
+    // Have to do this because each student has a status mode
+    function handleClassChange(c){
+        setActiveClass(c);
+        setStudents(c.students.map(s => ({...s, status: true})));
+    }
+
     let present=0;
     students.forEach(s => {
         if (s.status) present++;
@@ -54,20 +68,23 @@ function TeacherMark(){
 
     return (
         <div>
-            <h2>Mark Attendance</h2>
-            <h3>Today: {new Date().toLocaleDateString()}</h3>
+            <h2>Mark Attendance for {new Date().toLocaleDateString()}</h2>
 
             <div>
                 {CLASSES.map(c => (
-                    <button key={c} onClick={() => setActiveClass(c)}>{c}</button>
+                    <button key={c.id} className="classTabs" onClick={() => handleClassChange(c)}>{c.name}</button>
                 ))}
             </div>
 
-            <div className="presentCount">
-                <h3>Present</h3>
-                <h2>{present}</h2>
-                <h3>Absent</h3>
-                <h2>{absent}</h2>
+            <div className="classStats">
+                <div>
+                    <h3>Present</h3>
+                    <h2>{present}</h2>
+                </div>
+                <div>
+                    <h3>Absent</h3>
+                    <h2>{absent}</h2>
+                </div>
             </div>
 
             <div className="studentTable">
@@ -77,7 +94,7 @@ function TeacherMark(){
                             <tr>
                                 <th>Student</th>
                                 <th>Email</th>
-                                <th>Presence</th>
+                                <th>Status</th>
                                 <th>Change</th>
                             </tr>
                         </thead>
@@ -96,7 +113,7 @@ function TeacherMark(){
                             ))}
                         </tbody>
                     </table>
-                    <button type="submit">Submit Attendance</button>
+                    <button className="submitAttendance" type="submit">Submit Attendance</button>
                 </form>
             </div>
         </div>
