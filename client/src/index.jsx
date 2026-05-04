@@ -19,7 +19,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      {user && <NavBar user={user} logout(logOut) />}
+      {user && <NavBar user={user} logout={logOut} />}
       <Routes>
         <Route path="/" element={<Login onLogin={setUser} />} />
         <Route path="/teacher/overview" element={<TeacherOverview user={user} />} />
