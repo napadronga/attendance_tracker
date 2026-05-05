@@ -345,27 +345,35 @@ h3 {
 
 /* Class Tabs */
 
-.classTabs,
+.classTabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 .classTab {
-  padding: 10px 16px;
-  margin: 8px 8px 16px 0;
+  padding: 12px 20px;
+  min-width: 140px;
+  text-align: center;
+  margin: 0;
   border-radius: 999px;
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--muted);
   font-weight: 700;
+  font-size: 15px;
   transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease,
     box-shadow 0.18s ease;
 }
 
-.classTabs:hover,
 .classTab:hover {
   background: var(--primary-light);
   color: var(--primary);
   transform: translateY(-1px);
 }
 
-.classTabs.active,
 .classTab.active {
   background: var(--primary);
   color: white;
