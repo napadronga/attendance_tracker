@@ -71,57 +71,76 @@ async function seedClassAttendance({
   await recalculateSummary(studentId, classId);
 }
 
+const demoSeedPlan = [
+  {
+    email: "student@school.edu",
+    wipeClassIds: [1, 2, 3],
+    sessions: [
+      { classId: 1, month: 1, attendedCount: 17, totalCount: 20 },
+      { classId: 2, month: 2, attendedCount: 14, totalCount: 20 },
+      { classId: 3, month: 3, attendedCount: 18, totalCount: 20 },
+    ],
+  },
+  {
+    email: "nat@school.edu",
+    wipeClassIds: [1, 4, 5],
+    sessions: [
+      { classId: 1, month: 1, attendedCount: 16, totalCount: 20 },
+      { classId: 4, month: 4, attendedCount: 13, totalCount: 18 },
+      { classId: 5, month: 6, attendedCount: 14, totalCount: 16 },
+    ],
+  },
+  {
+    email: "roy@school.edu",
+    wipeClassIds: [2, 3, 4],
+    sessions: [
+      { classId: 2, month: 2, attendedCount: 15, totalCount: 20 },
+      { classId: 3, month: 3, attendedCount: 16, totalCount: 20 },
+      { classId: 4, month: 4, attendedCount: 11, totalCount: 18 },
+    ],
+  },
+];
+
 async function seedAttendance() {
   try {
-    const [[student]] = await db.query("SELECT id FROM users WHERE email = ?", [
-      "student@gmail.com",
-    ]);
-
     const [[teacher]] = await db.query("SELECT id FROM users WHERE email = ?", [
-      "teacher@gmail.com",
+      "teacher@school.edu",
     ]);
 
-    if (!student || !teacher) {
+    if (!teacher) {
       throw new Error("Run seedUsers.js first.");
     }
 
-    // Reset demo attendance for this student/classes.
-    // This is only for demo data.
-    await db.query(
-      `
-      DELETE FROM attendance
-      WHERE student_id = ?
-        AND class_id IN (1, 2, 3)
-      `,
-      [student.id]
-    );
+    for (const plan of demoSeedPlan) {
+      const [[student]] = await db.query(
+        "SELECT id FROM users WHERE email = ?",
+        [plan.email]
+      );
+      if (!student) {
+        throw new Error(`Missing user ${plan.email}`);
+      }
 
-    await seedClassAttendance({
-      classId: 1,
-      studentId: student.id,
-      teacherId: teacher.id,
-      month: 1,
-      attendedCount: 17,
-      totalCount: 20,
-    });
+      const placeholders = plan.wipeClassIds.map(() => "?").join(", ");
+      await db.query(
+        `
+        DELETE FROM attendance
+        WHERE student_id = ?
+          AND class_id IN (${placeholders})
+        `,
+        [student.id, ...plan.wipeClassIds]
+      );
 
-    await seedClassAttendance({
-      classId: 2,
-      studentId: student.id,
-      teacherId: teacher.id,
-      month: 2,
-      attendedCount: 14,
-      totalCount: 20,
-    });
-
-    await seedClassAttendance({
-      classId: 3,
-      studentId: student.id,
-      teacherId: teacher.id,
-      month: 3,
-      attendedCount: 18,
-      totalCount: 20,
-    });
+      for (const session of plan.sessions) {
+        await seedClassAttendance({
+          classId: session.classId,
+          studentId: student.id,
+          teacherId: teacher.id,
+          month: session.month,
+          attendedCount: session.attendedCount,
+          totalCount: session.totalCount,
+        });
+      }
+    }
 
     console.log("Demo attendance records seeded and summaries recalculated.");
     process.exit();
