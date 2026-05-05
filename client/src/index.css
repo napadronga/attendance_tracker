@@ -76,10 +76,18 @@ main,
 /* Login */
 
 .loginPage {
+  position: relative;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.loginPageToggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 1;
 }
 
 .loginCard {
@@ -154,6 +162,72 @@ main,
   border-radius: 12px;
   font-size: 15px;
   background: var(--card);
+  color: var(--text);
+}
+
+..loginForm input::placeholder,
+.excuseForm textarea::placeholder,
+.excuseForm input::placeholder {
+  color: var(--muted);
+}
+
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0;
+}
+
+.themeToggle:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.themeTrack {
+  width: 54px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ede9fe;
+  border: 1px solid #e4ddf4;
+  position: relative;
+  display: inline-block;
+  transition: background 0.2s ease;
+}
+
+.themeThumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease;
+}
+
+[data-theme="dark"] .themeTrack {
+  background: #31264f;
+  border-color: #3b315a;
+}
+
+[data-theme="dark"] .themeThumb {
+  transform: translateX(25px);
+  background: #f8f5ff;
+}
+
+.loginThemeToggle {
+  margin-top: 14px;
+  width: fit-content;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--primary-light);
 }
 
 .loginForm input:focus,

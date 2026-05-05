@@ -13,7 +13,7 @@ async function loginUser(email, password, role){
     });
 }
 
-function Login({ onLogin }){
+function Login({ onLogin, theme, toggleTheme }){
     const [role, setRole] = useState('student');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState ('');
@@ -75,6 +75,18 @@ function Login({ onLogin }){
 
     return(
         <main className="loginPage">
+            <button
+              type="button"
+              className="themeToggle loginPageToggle"
+              onClick={toggleTheme}
+              aria-label="Toggle dark and light theme"
+            >
+              <span className="themeIcon">{theme === 'light' ? '☀️' : '🌙'}</span>
+              <span className="themeTrack">
+                <span className="themeThumb"></span>
+              </span>
+            </button>
+
             <section className="loginCard">
                 <div className="loginHeader">
                     <h1>Attendance Portal</h1>

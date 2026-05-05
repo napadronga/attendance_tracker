@@ -47,7 +47,7 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/" element={<Login onLogin={setUser} />} />
+          <Route path="/" element={<Login onLogin={setUser} theme={theme} toggleTheme={toggleTheme} />} />
 
           <Route
             path="/teacher/overview"
