@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 05, 2026 at 04:25 PM
+-- Generation Time: May 05, 2026 at 06:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -144,7 +144,10 @@ INSERT INTO `attendance` (`id`, `class_id`, `student_id`, `date`, `status`, `mar
 (83, 3, 1, '2026-03-20', 'absent', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
 (84, 1, 1, '2026-05-04', 'present', 2, '2026-05-04 11:57:00', '2026-05-04 11:57:13'),
 (88, 2, 1, '2026-05-04', 'present', 2, '2026-05-04 11:57:20', '2026-05-04 11:59:06'),
-(129, 3, 1, '2026-05-04', 'present', 2, '2026-05-04 11:58:53', '2026-05-04 11:58:53');
+(129, 3, 1, '2026-05-04', 'present', 2, '2026-05-04 11:58:53', '2026-05-04 11:58:53'),
+(132, 4, 5, '2026-05-05', 'present', 7, '2026-05-05 14:26:50', '2026-05-05 14:27:02'),
+(133, 4, 3, '2026-05-05', 'present', 7, '2026-05-05 14:26:50', '2026-05-05 14:27:02'),
+(134, 4, 1, '2026-05-05', 'absent', 7, '2026-05-05 14:26:50', '2026-05-05 14:27:02');
 
 -- --------------------------------------------------------
 
@@ -172,7 +175,10 @@ INSERT INTO `attendance_summary` (`id`, `student_id`, `class_id`, `total_classes
 (3, 1, 3, 21, 19, 90.48, '2026-05-04 11:58:53'),
 (24, 5, 1, 0, 0, 0.00, '2026-05-05 14:16:36'),
 (25, 5, 2, 0, 0, 0.00, '2026-05-05 14:16:38'),
-(27, 5, 3, 0, 0, 0.00, '2026-05-05 14:16:43');
+(27, 5, 3, 0, 0, 0.00, '2026-05-05 14:16:43'),
+(28, 5, 4, 1, 1, 100.00, '2026-05-05 14:26:50'),
+(29, 3, 4, 1, 1, 100.00, '2026-05-05 14:26:50'),
+(30, 1, 4, 1, 0, 0.00, '2026-05-05 14:27:02');
 
 -- --------------------------------------------------------
 
@@ -210,7 +216,8 @@ CREATE TABLE `classes` (
 INSERT INTO `classes` (`id`, `name`, `teacher_id`, `min_attendance_pct`, `max_students`, `created_at`) VALUES
 (1, 'Biology', 2, 75.00, NULL, '2026-05-04 11:12:06'),
 (2, 'English', 2, 75.00, NULL, '2026-05-04 11:12:06'),
-(3, 'Math', 2, 80.00, NULL, '2026-05-04 11:12:06');
+(3, 'Math', 2, 80.00, NULL, '2026-05-04 11:12:06'),
+(4, 'CSCI-4410', 7, 75.00, NULL, '2026-05-05 14:25:59');
 
 -- --------------------------------------------------------
 
@@ -235,7 +242,10 @@ INSERT INTO `enrollments` (`id`, `student_id`, `class_id`, `enrolled_at`) VALUES
 (3, 1, 3, '2026-05-04 11:12:06'),
 (4, 5, 1, '2026-05-05 14:16:36'),
 (5, 5, 2, '2026-05-05 14:16:38'),
-(7, 5, 3, '2026-05-05 14:16:43');
+(7, 5, 3, '2026-05-05 14:16:43'),
+(8, 5, 4, '2026-05-05 14:26:07'),
+(9, 3, 4, '2026-05-05 14:26:09'),
+(10, 1, 4, '2026-05-05 14:26:11');
 
 -- --------------------------------------------------------
 
@@ -403,13 +413,13 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
 
 --
 -- AUTO_INCREMENT for table `attendance_summary`
 --
 ALTER TABLE `attendance_summary`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
@@ -421,13 +431,13 @@ ALTER TABLE `audit_logs`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `reports`
