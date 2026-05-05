@@ -181,7 +181,7 @@ function TeacherMark({ user }) {
       <h2>Mark Attendance</h2>
       <h3>Today: {new Date().toLocaleDateString()}</h3>
 
-      <div>
+      <div className="classTabs">
         {classes.map((c) => (
           <button
             key={c.id}

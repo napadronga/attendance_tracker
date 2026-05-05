@@ -521,7 +521,7 @@ tr:last-child td {
 }
 
 td button {
-  padding: 8px 12px;
+  padding: 10px 16px;
   border-radius: 10px;
   background: var(--primary);
   color: white;
