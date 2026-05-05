@@ -14,6 +14,34 @@
   --radius: 18px;
 }
 
+[data-theme="dark"] {
+  --bg: #120f1f;
+  --card: #1f1a33;
+  --text: #f8f5ff;
+  --muted: #c7bddb;
+  --primary: #a78bfa;
+  --primary-light: #31264f;
+  --accent: #8b5cf6;
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #facc15;
+  --border: #3b315a;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.38);
+  --radius: 18px;
+}
+
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+[data-theme="light"],
+[data-theme="dark"] {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
 /* Reset / Base */
 
 * {
@@ -90,7 +118,7 @@ main,
   flex: 1;
   padding: 12px;
   border-radius: 12px;
-  background: #e5e7eb;
+  background: var(--primary-light);
   color: var(--text);
   font-weight: 700;
   transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
@@ -125,7 +153,7 @@ main,
   border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 15px;
-  background: white;
+  background: var(--card);
 }
 
 .loginForm input:focus,
@@ -149,7 +177,8 @@ main,
 }
 
 .submitButton:hover {
-  background: #006ed6;
+  background: var(--primary);
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
@@ -162,7 +191,9 @@ main,
 }
 
 .smallButton:hover {
-  background: #006ed6;
+  background: var(--primary);
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* Headings */
@@ -218,6 +249,26 @@ h3 {
   color: #374151;
 }
 
+.statusBadge.present {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.statusBadge.excused {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.statusBadge.absent {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.statusBadge.late {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 /* Class Tabs */
 
 .classTabs,
@@ -225,7 +276,7 @@ h3 {
   padding: 10px 16px;
   margin: 8px 8px 16px 0;
   border-radius: 999px;
-  background: white;
+  background: var(--card);
   border: 1px solid var(--border);
   color: var(--muted);
   font-weight: 700;
@@ -245,7 +296,7 @@ h3 {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
-  box-shadow: 0 8px 18px rgba(11, 132, 255, 0.22);
+  box-shadow: 0 8px 18px rgba(109, 40, 217, 0.22);
 }
 
 /* Cards / Stats */
@@ -378,7 +429,7 @@ td {
 }
 
 th {
-  background: #f9fafb;
+  background: var(--primary-light);
   font-size: 14px;
   color: var(--muted);
 }
@@ -397,37 +448,41 @@ td button {
 }
 
 td button:hover {
-  background: #006ed6;
+  background: var(--primary);
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
 /* Messages */
 
 .errorMessage {
-  background: #fee2e2;
+  background: rgba(248, 113, 113, 0.16);
   color: var(--danger);
   padding: 12px;
   border-radius: 12px;
   font-weight: 700;
   margin: 12px 0;
+  border: 1px solid rgba(248, 113, 113, 0.35);
 }
 
 .successMessage {
-  background: #dcfce7;
+  background: rgba(34, 197, 94, 0.16);
   color: var(--success);
   padding: 12px;
   border-radius: 12px;
   font-weight: 700;
   margin: 12px 0;
+  border: 1px solid rgba(34, 197, 94, 0.35);
 }
 
 .emptyState {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(250, 204, 21, 0.16);
+  color: var(--warning);
   padding: 14px;
   border-radius: 12px;
   font-weight: 700;
   margin: 14px 0;
+  border: 1px solid rgba(250, 204, 21, 0.35);
 }
 
 /* Excuse Form */
@@ -462,7 +517,8 @@ td button:hover {
 
 .excuseForm button:hover,
 .formActions button:hover {
-  background: #006ed6;
+  background: var(--primary);
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 

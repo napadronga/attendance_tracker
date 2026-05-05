@@ -1,4 +1,4 @@
-import { StrictMode, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -11,81 +11,102 @@ import TeacherMark from "./pages/TeacherMark.jsx";
 import TeacherHistory from "./pages/TeacherHistory.jsx";
 import StudentOverview from "./pages/StudentOverview.jsx";
 import StudentAttendance from "./pages/StudentAttendance.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import TeacherExcuses from "./pages/TeacherExcuses.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   function logOut() {
     localStorage.removeItem("token");
     setUser(null);
   }
 
+  function toggleTheme() {
+    setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
+  }
+
   return (
-    <BrowserRouter>
-      {user && <Navbar user={user} logout={logOut} />}
+    <div data-theme={theme}>
+      <BrowserRouter>
+        {user && (
+          <Navbar
+            user={user}
+            logout={logOut}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        )}
 
-      <Routes>
-        <Route path="/" element={<Login onLogin={setUser} />} />
+        <Routes>
+          <Route path="/" element={<Login onLogin={setUser} />} />
 
-        <Route
-          path="/teacher/overview"
-          element={
-            <ProtectedRoute user={user} allowedRole="teacher">
-              <TeacherOverview user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/teacher/overview"
+            element={
+              <ProtectedRoute user={user} allowedRole="teacher">
+                <TeacherOverview user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/teacher/mark"
-          element={
-            <ProtectedRoute user={user} allowedRole="teacher">
-              <TeacherMark user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/teacher/mark"
+            element={
+              <ProtectedRoute user={user} allowedRole="teacher">
+                <TeacherMark user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/teacher/history"
-          element={
-            <ProtectedRoute user={user} allowedRole="teacher">
-              <TeacherHistory user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/teacher/history"
+            element={
+              <ProtectedRoute user={user} allowedRole="teacher">
+                <TeacherHistory user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/student/overview"
-          element={
-            <ProtectedRoute user={user} allowedRole="student">
-              <StudentOverview user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/teacher/excuses"
+            element={
+              <ProtectedRoute user={user} allowedRole="teacher">
+                <TeacherExcuses user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/student/attendance"
-          element={
-            <ProtectedRoute user={user} allowedRole="student">
-              <StudentAttendance user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/student/overview"
+            element={
+              <ProtectedRoute user={user} allowedRole="student">
+                <StudentOverview user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/teacher/excuses"
-          element={
-            <ProtectedRoute user={user} allowedRole="teacher">
-              <TeacherExcuses user={user} />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/student/attendance"
+            element={
+              <ProtectedRoute user={user} allowedRole="student">
+                <StudentAttendance user={user} />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
