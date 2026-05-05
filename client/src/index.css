@@ -154,6 +154,8 @@ main,
   border-radius: 12px;
   font-size: 15px;
   background: var(--card);
+  color: var(--text);
+  caret-color: var(--primary);
 }
 
 .loginForm input:focus,
@@ -161,6 +163,21 @@ main,
 .excuseForm input:focus {
   outline: 3px solid var(--primary-light);
   border-color: var(--primary);
+}
+
+.loginForm input::placeholder,
+.excuseForm textarea::placeholder,
+.excuseForm input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.loginForm input:-webkit-autofill,
+.loginForm input:-webkit-autofill:hover,
+.loginForm input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  box-shadow: 0 0 0px 1000px var(--card) inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 /* Buttons */
@@ -520,6 +537,37 @@ td button:hover {
   background: var(--primary);
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+.authSwitch {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.authSwitch a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.authSwitch a:hover {
+  text-decoration: underline;
+}
+
+.loginForm select {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.loginForm select:focus {
+  outline: 3px solid var(--primary-light);
+  border-color: var(--primary);
 }
 
 /* Responsive */

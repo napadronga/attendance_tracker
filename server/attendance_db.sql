@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2026 at 02:25 PM
+-- Generation Time: May 05, 2026 at 04:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,15 @@ CREATE TABLE `absence_excuses` (
   `reviewed_by` int(11) DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `absence_excuses`
+--
+
+INSERT INTO `absence_excuses` (`id`, `attendance_id`, `reason`, `status`, `reviewed_by`, `submitted_at`) VALUES
+(2, 43, 'i dont know', 'approved', 2, '2026-05-04 12:40:45'),
+(3, 42, 'i dont know', 'approved', 2, '2026-05-04 12:48:32'),
+(4, 41, 'wadaw', 'approved', 2, '2026-05-04 13:03:09');
 
 -- --------------------------------------------------------
 
@@ -90,9 +99,9 @@ INSERT INTO `attendance` (`id`, `class_id`, `student_id`, `date`, `status`, `mar
 (38, 1, 1, '2026-01-15', 'present', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
 (39, 1, 1, '2026-01-16', 'present', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
 (40, 1, 1, '2026-01-17', 'present', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
-(41, 1, 1, '2026-01-18', 'absent', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
-(42, 1, 1, '2026-01-19', 'absent', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
-(43, 1, 1, '2026-01-20', 'absent', 2, '2026-05-04 11:56:19', '2026-05-04 11:56:19'),
+(41, 1, 1, '2026-01-18', 'excused', 2, '2026-05-04 11:56:19', '2026-05-04 13:04:39'),
+(42, 1, 1, '2026-01-19', 'excused', 2, '2026-05-04 11:56:19', '2026-05-04 12:56:33'),
+(43, 1, 1, '2026-01-20', 'excused', 2, '2026-05-04 11:56:19', '2026-05-04 13:05:57'),
 (44, 2, 1, '2026-02-01', 'absent', 2, '2026-05-04 11:56:19', '2026-05-04 12:03:05'),
 (45, 2, 1, '2026-02-02', 'present', 2, '2026-05-04 11:56:19', '2026-05-04 11:58:32'),
 (46, 2, 1, '2026-02-03', 'present', 2, '2026-05-04 11:56:19', '2026-05-04 11:58:32'),
@@ -158,9 +167,12 @@ CREATE TABLE `attendance_summary` (
 --
 
 INSERT INTO `attendance_summary` (`id`, `student_id`, `class_id`, `total_classes`, `attended_classes`, `attendance_pct`, `last_updated`) VALUES
-(1, 1, 1, 21, 18, 85.71, '2026-05-04 11:57:13'),
+(1, 1, 1, 21, 21, 100.00, '2026-05-04 13:06:19'),
 (2, 1, 2, 21, 14, 66.67, '2026-05-04 12:03:05'),
-(3, 1, 3, 21, 19, 90.48, '2026-05-04 11:58:53');
+(3, 1, 3, 21, 19, 90.48, '2026-05-04 11:58:53'),
+(24, 5, 1, 0, 0, 0.00, '2026-05-05 14:16:36'),
+(25, 5, 2, 0, 0, 0.00, '2026-05-05 14:16:38'),
+(27, 5, 3, 0, 0, 0.00, '2026-05-05 14:16:43');
 
 -- --------------------------------------------------------
 
@@ -220,7 +232,10 @@ CREATE TABLE `enrollments` (
 INSERT INTO `enrollments` (`id`, `student_id`, `class_id`, `enrolled_at`) VALUES
 (1, 1, 1, '2026-05-04 11:12:06'),
 (2, 1, 2, '2026-05-04 11:12:06'),
-(3, 1, 3, '2026-05-04 11:12:06');
+(3, 1, 3, '2026-05-04 11:12:06'),
+(4, 5, 1, '2026-05-05 14:16:36'),
+(5, 5, 2, '2026-05-05 14:16:38'),
+(7, 5, 3, '2026-05-05 14:16:43');
 
 -- --------------------------------------------------------
 
@@ -262,7 +277,12 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `password_hash`, `first_name`, `last_name`, `role`, `two_factor_enabled`, `two_factor_secret`, `created_at`) VALUES
 (1, 'student@gmail.com', '$2b$10$Eg/3GLTclKEU1mf7Nm6vmu/RC5QGPYgDK3xEwNWaKqXHaa82S8CCa', 'Test', 'Student', 'student', 0, NULL, '2026-05-04 11:04:24'),
-(2, 'teacher@gmail.com', '$2b$10$Eg/3GLTclKEU1mf7Nm6vmu/RC5QGPYgDK3xEwNWaKqXHaa82S8CCa', 'Test', 'Teacher', 'teacher', 0, NULL, '2026-05-04 11:04:24');
+(2, 'teacher@gmail.com', '$2b$10$Eg/3GLTclKEU1mf7Nm6vmu/RC5QGPYgDK3xEwNWaKqXHaa82S8CCa', 'Test', 'Teacher', 'teacher', 0, NULL, '2026-05-04 11:04:24'),
+(3, 'newstudent@gmail.com', '$2b$10$gESWqT483fFItqw3LQLIO.Em6dclXpkSIHc9fVEddBwXj3IEFzk3W', 'New', 'Student', 'student', 0, NULL, '2026-05-05 13:58:05'),
+(4, 'ninyo.seneoudom00@gmail.com', '$2b$10$8.8wlKKUTZlL/C/8i9MWeOcVUd3ku8CUbZwH3sAgqOsH//yiHdX1q', 'ninyo', 'seneoudom', 'student', 0, NULL, '2026-05-05 14:03:05'),
+(5, 'ninyohummen1@gmail.com', '$2b$10$I3eOqVyAdVym/DDqJXolsOSf7QsvTVi9xEVt8R7KRTyxpcrNco9vy', 'ninyo', 'seneoudom', 'student', 0, NULL, '2026-05-05 14:04:09'),
+(6, 'admin@gmail.com', '$2b$10$rWxiOs4YMPCWgEEXHobY3eeyFZy/PeeIbOIfhvEhTQHZIoEFidPHG', 'Test', 'Admin', 'admin', 0, NULL, '2026-05-05 14:09:59'),
+(7, 'teacher1@gmail.com', '$2b$10$4pkgJMi6grCzpPHdP6MkCO2RJZY9r8PG8L6xJn/UFHyXRgSTyEng.', 'new', 'teacher1', 'teacher', 0, NULL, '2026-05-05 14:23:16');
 
 -- --------------------------------------------------------
 
@@ -371,7 +391,7 @@ ALTER TABLE `user_sessions`
 -- AUTO_INCREMENT for table `absence_excuses`
 --
 ALTER TABLE `absence_excuses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -389,7 +409,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `attendance_summary`
 --
 ALTER TABLE `attendance_summary`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
@@ -407,7 +427,7 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `enrollments`
 --
 ALTER TABLE `enrollments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `reports`
@@ -419,7 +439,7 @@ ALTER TABLE `reports`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `user_sessions`

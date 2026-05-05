@@ -13,6 +13,9 @@ import StudentOverview from "./pages/StudentOverview.jsx";
 import StudentAttendance from "./pages/StudentAttendance.jsx";
 import TeacherExcuses from "./pages/TeacherExcuses.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Register from "./pages/Register.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -102,8 +105,20 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/register" element={<Register />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute user={user} allowedRole="admin">
+                <AdminDashboard user={user} />
+              </ProtectedRoute>
+            }
+          />
+          
         </Routes>
       </BrowserRouter>
     </div>

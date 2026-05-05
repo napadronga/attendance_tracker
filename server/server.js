@@ -6,6 +6,7 @@ const fs = require("fs");
 const db = require("./db");
 const authRoutes = require("./auth/authRoutes");
 const teacherRoutes = require("./teacher/teacherRoutes");
+const adminRoutes = require("./admin/adminRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/teacher", teacherRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 // api route

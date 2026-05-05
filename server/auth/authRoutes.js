@@ -54,4 +54,63 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/register", async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+
+    if (!firstName || !lastName || !email || !password || !role) {
+      return res.status(400).json({
+        message: "All fields are required.",
+      });
+    }
+
+    if (!["student", "teacher", "admin"].includes(role)) {
+      return res.status(400).json({
+        message: "Role must be student or teacher.",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters.",
+      });
+    }
+
+    const [existingUsers] = await db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(409).json({
+        message: "An account with this email already exists.",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const [result] = await db.query(
+      `
+      INSERT INTO users (email, password_hash, first_name, last_name, role)
+      VALUES (?, ?, ?, ?, ?)
+      `,
+      [email, passwordHash, firstName, lastName, role]
+    );
+
+    res.status(201).json({
+      user: {
+        id: result.insertId,
+        name: `${firstName} ${lastName}`,
+        email,
+        role,
+      },
+    });
+  } catch (err) {
+    console.error("Register error:", err);
+    res.status(500).json({
+      message: "Could not register user.",
+    });
+  }
+});
+
 module.exports = router;

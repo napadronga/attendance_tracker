@@ -9,7 +9,13 @@ function Navbar({ user, logout, theme, toggleTheme }) {
       <h3>Attendance Portal</h3>
 
       <nav>
-        {user.role === "teacher" ? (
+        {user.role === "admin" ? (
+          <ul>
+            <li>
+              <Link to="/admin/dashboard">Admin Dashboard</Link>
+            </li>
+          </ul>
+        ) : user.role === "teacher" ? (
           <ul>
             <li>
               <Link to="/teacher/overview">Overview</Link>

@@ -2,7 +2,7 @@
 
 A web-based attendance management system built with React, Node.js, Express, and MySQL/MariaDB.
 
-Students can view attendance, see absences, submit absence excuses, and see whether an excuse is pending, approved, or rejected. Teachers can view class statistics, mark students present or absent, edit previous attendance records, and approve or reject student excuses.
+Students can register, log in, view attendance, see absences, submit absence excuses, and see whether an excuse is pending, approved, or rejected. Teachers can view class statistics, mark students present or absent, edit previous attendance records, and approve or reject student excuses. Admin users can manage users, classes, and student enrollments.
 
 ---
 
@@ -13,12 +13,13 @@ Students can view attendance, see absences, submit absence excuses, and see whet
 - React Router
 - Recharts
 - CSS
+- JavaScript
 
 ### Backend
 - Node.js
 - Express
 - MySQL / MariaDB
-- bcrypt
+- bcrypt for password hashing
 
 ### Database
 - MySQL / MariaDB
@@ -27,6 +28,13 @@ Students can view attendance, see absences, submit absence excuses, and see whet
 ---
 
 ## 2. Main Features
+
+### Authentication Features
+- Register new accounts
+- Login by role: student, teacher, or admin
+- Hashed passwords using bcrypt
+- Protected routes based on user role
+- Logout functionality
 
 ### Student Features
 - Login as a student
@@ -53,6 +61,21 @@ Students can view attendance, see absences, submit absence excuses, and see whet
 - Approve or reject student excuses
 - Attendance overview updates after attendance records or excuses are changed
 
+### Admin Features
+- Login as an admin
+- View users
+- Create student, teacher, or admin accounts
+- Create classes
+- Assign teachers to classes
+- Enroll students into classes
+- Create starter attendance summary records for enrolled students
+
+### Unique Features
+- Dark/light theme switcher
+- Theme preference saved with local storage
+- Interactive attendance charts using Recharts
+- Excuse approval workflow that updates attendance status
+
 ---
 
 ## 3. Folder Structure
@@ -67,12 +90,15 @@ attendance_tracker
 │       │   └── ProtectedRoute.jsx
 │       ├── pages
 │       │   ├── Login.jsx
+│       │   ├── Register.jsx
+│       │   ├── ForgotPassword.jsx
 │       │   ├── StudentOverview.jsx
 │       │   ├── StudentAttendance.jsx
 │       │   ├── TeacherOverview.jsx
 │       │   ├── TeacherMark.jsx
 │       │   ├── TeacherHistory.jsx
-│       │   └── TeacherExcuses.jsx
+│       │   ├── TeacherExcuses.jsx
+│       │   └── AdminDashboard.jsx
 │       ├── api.js
 │       ├── index.jsx
 │       └── index.css
@@ -83,17 +109,22 @@ attendance_tracker
 │   │   └── studentRoutes.js
 │   ├── teacher
 │   │   └── teacherRoutes.js
+│   ├── admin
+│   │   └── adminRoutes.js
 │   ├── db.js
 │   ├── schema.sql
 │   ├── seedUsers.js
 │   ├── seedDemoData.js
 │   ├── seedAttendance.js
+│   ├── seedAdmin.js
 │   ├── attendance_db.sql
 │   └── server.js
 ├── .env.example
 ├── package.json
 └── README.md
 ```
+
+Note: The exact folder structure may vary slightly depending on the final files included by the team.
 
 ---
 
@@ -217,6 +248,7 @@ This SQL export includes:
 - database tables
 - demo student account
 - demo teacher account
+- demo admin account, if included in the export
 - Biology, English, and Math classes
 - enrollments
 - attendance records
@@ -280,6 +312,12 @@ node server/seedDemoData.js
 node server/seedAttendance.js
 ```
 
+### Step 5: Seed admin user, if included
+
+```powershell
+node server/seedAdmin.js
+```
+
 ---
 
 ## 10. Demo Login Accounts
@@ -298,6 +336,14 @@ Role: Student
 Email: teacher@gmail.com
 Password: password123
 Role: Teacher
+```
+
+### Admin Login
+
+```txt
+Email: admin@gmail.com
+Password: password123
+Role: Admin
 ```
 
 The selected role must match the account.
@@ -358,7 +404,16 @@ If the database is not connected, check:
 
 ---
 
-## 13. Test Login API
+## 13. Test Authentication API
+
+### Register API Test
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:5001/api/auth/register" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{"firstName":"New","lastName":"Student","email":"newstudent@gmail.com","password":"password123","role":"student"}'
+```
 
 ### Teacher Login API Test
 
@@ -378,7 +433,14 @@ Invoke-RestMethod -Uri "http://localhost:5001/api/auth/login" `
   -Body '{"email":"student@gmail.com","password":"password123","role":"student"}'
 ```
 
-Both should return a user object.
+### Admin Login API Test
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:5001/api/auth/login" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{"email":"admin@gmail.com","password":"password123","role":"admin"}'
+```
 
 ---
 
@@ -387,6 +449,7 @@ Both should return a user object.
 ### Auth
 
 ```txt
+POST /api/auth/register
 POST /api/auth/login
 ```
 
@@ -412,13 +475,27 @@ GET /api/teacher/excuses?teacherId=2
 PUT /api/teacher/excuses/:excuseId
 ```
 
----
-
-## 15. How Student and Teacher Are Connected
-
-The student and teacher are connected through the database.
+### Admin
 
 ```txt
+GET /api/admin/users
+POST /api/admin/users
+GET /api/admin/classes
+POST /api/admin/classes
+POST /api/admin/enrollments
+```
+
+---
+
+## 15. How Student, Teacher, and Admin Are Connected
+
+The student, teacher, and admin roles are connected through the database.
+
+```txt
+Admin
+   ↓
+creates users, creates classes, enrolls students
+
 Teacher user
    ↓
 classes.teacher_id
@@ -436,6 +513,7 @@ attendance.class_id + attendance.student_id
 
 This means:
 
+- Admins manage users, classes, and enrollments.
 - A teacher owns classes.
 - A student is enrolled in classes.
 - Attendance records belong to a student and a class.
@@ -519,12 +597,21 @@ Because of this, approving an excuse may increase the student's attendance perce
 
 ## 17. Testing Checklist
 
+### Authentication
+
+- Register page creates a new user
+- Registered password is hashed in MySQL
+- Student login works
+- Teacher login works
+- Admin login works
+- Wrong role does not log in
+- Logout works
+
 ### Student Side
 
-- Log in as student
 - Student redirects to student overview
-- Student cannot access teacher pages
-- Student overview loads Biology, English, and Math
+- Student cannot access teacher or admin pages
+- Student overview loads classes
 - Student chart loads
 - Student attendance page shows missed days
 - Student can submit an excuse
@@ -532,13 +619,11 @@ Because of this, approving an excuse may increase the student's attendance perce
 - Student sees excuse status as pending after submitting
 - Student sees approved or rejected after teacher review
 - Student sees attendance status change to excused after approval
-- Logout works
 
 ### Teacher Side
 
-- Log in as teacher
 - Teacher redirects to teacher overview
-- Teacher cannot access student pages
+- Teacher cannot access student or admin pages
 - Teacher can switch classes
 - Teacher overview loads student data
 - Teacher chart loads
@@ -552,25 +637,31 @@ Because of this, approving an excuse may increase the student's attendance perce
 - Teacher can approve or reject excuses
 - Approved excuses change attendance status to excused
 - Rejected excuses keep attendance status as absent
-- Logout works
+
+### Admin Side
+
+- Admin redirects to admin dashboard
+- Admin can view users
+- Admin can create users
+- Admin can view classes
+- Admin can create classes
+- Admin can enroll students into classes
+- Newly enrolled students can see assigned classes
+
+### Theme
+
+- Dark/light theme toggle works
+- Theme stays after refresh
+- Login, student, teacher, and admin pages are readable in both themes
 
 ---
 
-## 18. Registration Note
+## 18. Registration and Admin Note
 
-This project does not include public registration.
+This project includes registration to meet the authentication requirement. Passwords are hashed with bcrypt before being stored in the MySQL database.
 
-In a real attendance system, students and teachers should not create their own accounts freely. Accounts and enrollments should be controlled by an administrator or school office.
+In a real school system, public registration should be restricted. Students and teachers should usually be created or approved by an administrator or school office. For this project, the admin dashboard supports user creation, class creation, and class enrollment.
 
-Future improvement:
-
-- Add an admin dashboard
-- Admin creates student accounts
-- Admin creates teacher accounts
-- Admin creates classes
-- Admin enrolls students into classes
-- Admin assigns teachers to classes
-(if you want to continue the project)
 ---
 
 ## 19. Common Problems and Fixes
@@ -606,6 +697,12 @@ Check:
 - The demo users exist
 - The selected role matches the account
 - `client/src/api.js` uses `http://localhost:5001`
+
+### New registered student has no classes
+
+A registered student must be enrolled into a class before classes appear in the student overview.
+
+Use the admin dashboard or insert into the `enrollments` table.
 
 ### Excuse is approved but still shows absent
 
@@ -649,7 +746,10 @@ npm start -- --force
 
 Connected core features:
 
+- Registration
 - Login
+- Hashed passwords
+- Role-based protected routes
 - Student overview
 - Student absences
 - Student excuse submission
@@ -659,16 +759,21 @@ Connected core features:
 - Teacher attendance history
 - Teacher excuse review
 - Teacher excuse approval/rejection
+- Admin dashboard
+- User creation
+- Class creation
+- Student enrollment
 - Edit previous attendance
 - Attendance summary updates
+- Dark/light theme switcher
+- Interactive charts
 
 Not included yet:
 
-- Public registration
-- Admin dashboard
 - JWT persistent login
 - PDF reports
 - Email notifications
+- Real email-based password reset
 
 ---
 
@@ -676,12 +781,11 @@ Not included yet:
 
 Possible improvements:
 
-- Admin dashboard
-- Admin-controlled registration
 - Teacher comments when rejecting excuses
 - Email notifications
 - JWT authentication
 - Persistent login after refresh
-- More students and teachers
 - More analytics and reports
 - Export attendance reports as PDF
+- Real forgot-password email reset
+- More detailed admin controls
