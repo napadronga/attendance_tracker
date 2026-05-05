@@ -154,7 +154,7 @@ function StudentAttendance({ user }) {
       <h2>Your Absences</h2>
       <h3>View your absences for each class.</h3>
 
-      <div>
+      <div className="classTabs">
         {classes.map((c) => (
           <button
             key={c.id}

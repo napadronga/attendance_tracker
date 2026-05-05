@@ -2,17 +2,12 @@ const db = require("./db");
 
 async function seedDemoData() {
   try {
-    const [[student]] = await db.query(
-      "SELECT id FROM users WHERE email = ?",
-      ["student@gmail.com"]
-    );
-
     const [[teacher]] = await db.query(
       "SELECT id FROM users WHERE email = ?",
-      ["teacher@gmail.com"]
+      ["teacher@school.edu"]
     );
 
-    if (!student || !teacher) {
+    if (!teacher) {
       throw new Error("Run seedUsers.js first.");
     }
 
@@ -22,42 +17,39 @@ async function seedDemoData() {
       VALUES
         (1, 'Biology', ?, 75),
         (2, 'English', ?, 75),
-        (3, 'Math', ?, 80)
+        (3, 'Math', ?, 80),
+        (4, 'Animal Psychology', ?, 78),
+        (5, 'Plant Physics', ?, 72)
       ON DUPLICATE KEY UPDATE
         name = VALUES(name),
         teacher_id = VALUES(teacher_id),
         min_attendance_pct = VALUES(min_attendance_pct)
       `,
-      [teacher.id, teacher.id, teacher.id]
+      [teacher.id, teacher.id, teacher.id, teacher.id, teacher.id]
     );
 
-    await db.query(
-      `
-      INSERT INTO enrollments (student_id, class_id)
-      VALUES
-        (?, 1),
-        (?, 2),
-        (?, 3)
-      ON DUPLICATE KEY UPDATE student_id = VALUES(student_id)
-      `,
-      [student.id, student.id, student.id]
-    );
+    const emailToEnrollment = {
+      "student@school.edu": [1, 2, 3],
+      "nat@school.edu": [1, 4, 5],
+      "roy@school.edu": [2, 3, 4],
+    };
 
-    await db.query(
-      `
-      INSERT INTO attendance_summary
-        (student_id, class_id, total_classes, attended_classes, attendance_pct)
-      VALUES
-        (?, 1, 20, 17, 85.00),
-        (?, 2, 20, 14, 70.00),
-        (?, 3, 20, 18, 90.00)
-      ON DUPLICATE KEY UPDATE
-        total_classes = VALUES(total_classes),
-        attended_classes = VALUES(attended_classes),
-        attendance_pct = VALUES(attendance_pct)
-      `,
-      [student.id, student.id, student.id]
-    );
+    for (const [email, classIds] of Object.entries(emailToEnrollment)) {
+      const [[row]] = await db.query("SELECT id FROM users WHERE email = ?", [
+        email,
+      ]);
+      if (!row) continue;
+      for (const classId of classIds) {
+        await db.query(
+          `
+          INSERT INTO enrollments (student_id, class_id)
+          VALUES (?, ?)
+          ON DUPLICATE KEY UPDATE student_id = VALUES(student_id)
+          `,
+          [row.id, classId]
+        );
+      }
+    }
 
     console.log("Demo class data seeded.");
     process.exit();

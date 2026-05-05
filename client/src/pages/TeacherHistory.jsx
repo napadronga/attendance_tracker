@@ -116,6 +116,14 @@ function TeacherHistory({ user }) {
       });
 
       setStudents(studentsWithStatus);
+      
+      // Scroll to bottom to edit form
+      setTimeout(() => {
+        const editSection = document.querySelector('.editHistory');
+        if (editSection) {
+          editSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     } catch (err) {
       setError(err.message || "Could not load attendance session.");
     } finally {
@@ -219,7 +227,7 @@ function TeacherHistory({ user }) {
       <h2>Class History</h2>
       <h3>View and edit previous attendance records.</h3>
 
-      <div>
+      <div className="classTabs">
         {classes.map((c) => (
           <button
             key={c.id}
@@ -262,8 +270,12 @@ function TeacherHistory({ user }) {
                   <td>{session.absent}</td>
                   <td>{getAttendancePercent(session)}%</td>
                   <td>
-                    <button type="button" onClick={() => openEdit(session)}>
-                      Edit
+                    <button 
+                      type="button" 
+                      onClick={() => openEdit(session)}
+                      disabled={loadingSession}
+                    >
+                      {loadingSession ? "Loading..." : "Edit"}
                     </button>
                   </td>
                 </tr>

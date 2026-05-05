@@ -11,10 +11,10 @@ async function loginUser(email, password, role) {
   });
 }
 
-function Login({ onLogin }) {
-  const [role, setRole] = useState("student");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function Login({ onLogin, theme, toggleTheme }){
+    const [role, setRole] = useState('student');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState ('');
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,13 +80,25 @@ function Login({ onLogin }) {
     }
   }
 
-  return (
-    <main className="loginPage">
-      <section className="loginCard">
-        <div className="loginHeader">
-          <h1>Attendance Portal</h1>
-          <p>Login to view and manage attendance</p>
-        </div>
+    return(
+        <main className="loginPage">
+            <button
+              type="button"
+              className="themeToggle loginPageToggle"
+              onClick={toggleTheme}
+              aria-label="Toggle dark and light theme"
+            >
+              <span className="themeIcon">{theme === 'light' ? '☀️' : '🌙'}</span>
+              <span className="themeTrack">
+                <span className="themeThumb"></span>
+              </span>
+            </button>
+
+            <section className="loginCard">
+                <div className="loginHeader">
+                    <h1>Attendance Portal</h1>
+                    <p>Login to view and manage attendance</p>
+                </div>
 
         <div className="roleButtons">
           <button
@@ -116,16 +128,16 @@ function Login({ onLogin }) {
 
         {error && <p className="errorMessage">{error}</p>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="loginForm">
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="person123@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+                <form onSubmit ={handleSubmit}>
+                    <div className="loginForm">
+                        <label>Email</label>
+                        <input
+                        type="email"
+                        placeholder="you@school.edu"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
 
           <div className="loginForm">
             <label>Password</label>

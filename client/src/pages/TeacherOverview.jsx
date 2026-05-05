@@ -137,7 +137,7 @@ function TeacherOverview({ user }) {
       <h2>Class Overview</h2>
       <h3>Attendance for your classes</h3>
 
-      <div>
+      <div className="classTabs">
         {classes.map((c) => (
           <button
             key={c.id}

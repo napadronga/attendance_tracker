@@ -88,7 +88,7 @@ function StudentOverview({ user }) {
         <p className="emptyState">No classes found.</p>
       ) : (
         <>
-          <div>
+          <div className="classTabs">
             {classes.map((c) => (
               <button
                 key={c.id}

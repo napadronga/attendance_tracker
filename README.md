@@ -112,7 +112,6 @@ attendance_tracker
 │   ├── admin
 │   │   └── adminRoutes.js
 │   ├── db.js
-│   ├── schema.sql
 │   ├── seedUsers.js
 │   ├── seedDemoData.js
 │   ├── seedAttendance.js
@@ -227,6 +226,13 @@ http://localhost/phpmyadmin
 
 ## 9. Database Setup
 
+The project ships **one** SQL file: `server/attendance_db.sql`. It creates the `attendance_db` database if needed, drops existing tables in the correct order, recreates the full schema, and loads the demo rows.
+
+### phpMyAdmin
+
+1. Start MySQL (XAMPP or MAMP).
+2. Open phpMyAdmin and select or create database `attendance_db`.
+3. Click **Import** and choose `server/attendance_db.sql`, then **Go**.
 There are two options.
 
 Use **Option A** if you want the exact same demo database as the original data.
@@ -285,15 +291,18 @@ Do not run the seed files after importing the full export because the export alr
 From the root project folder:
 
 ```powershell
-C:\xampp\mysql\bin\mysql.exe -u root < server/schema.sql
+C:\xampp\mysql\bin\mysql.exe -u root -p -h 127.0.0.1 -P 3306 < server\attendance_db.sql
 ```
 
-If your MySQL root account has a password:
+If the database already exists, you may instead run: `... mysql.exe ... attendance_db < server\attendance_db.sql`
 
-```powershell
-C:\xampp\mysql\bin\mysql.exe -u root -p < server/schema.sql
+### Command line (example: MAMP on macOS)
+
+```bash
+/Applications/MAMP/Library/bin/mysql80/bin/mysql -u root -p -h 127.0.0.1 -P 3306 < server/attendance_db.sql
 ```
 
+**Optional:** To rebuild demo attendance from code (after changing seed scripts), run `node server/seedUsers.js`, then `node server/seedDemoData.js`, then `node server/seedAttendance.js`.
 ### Step 2: Seed demo users
 
 ```powershell
@@ -322,19 +331,34 @@ node server/seedAdmin.js
 
 ## 10. Demo Login Accounts
 
-### Student Login
+All accounts use **password:** `password123`. Email addresses use the `@school.edu` domain.
+
+### Teacher
 
 ```txt
-Email: student@gmail.com
+Email: teacher@school.edu
+Password: password123
+Role: Teacher
+```
+
+### Students
+
+```txt
+Email: student@school.edu
 Password: password123
 Role: Student
 ```
 
-### Teacher Login
+```txt
+Email: nat@school.edu
+Password: password123
+Role: Student
+```
 
 ```txt
-Email: teacher@gmail.com
+Email: roy@school.edu
 Password: password123
+Role: Student
 Role: Teacher
 ```
 
@@ -421,7 +445,7 @@ Invoke-RestMethod -Uri "http://localhost:5001/api/auth/register" `
 Invoke-RestMethod -Uri "http://localhost:5001/api/auth/login" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"email":"teacher@gmail.com","password":"password123","role":"teacher"}'
+  -Body '{"email":"teacher@school.edu","password":"password123","role":"teacher"}'
 ```
 
 ### Student Login API Test
@@ -430,7 +454,7 @@ Invoke-RestMethod -Uri "http://localhost:5001/api/auth/login" `
 Invoke-RestMethod -Uri "http://localhost:5001/api/auth/login" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"email":"student@gmail.com","password":"password123","role":"student"}'
+  -Body '{"email":"student@school.edu","password":"password123","role":"student"}'
 ```
 
 ### Admin Login API Test
@@ -610,6 +634,8 @@ Because of this, approving an excuse may increase the student's attendance perce
 ### Student Side
 
 - Student redirects to student overview
+- Student cannot access teacher pages
+- Student overview loads Biology, English, and Math, etc
 - Student cannot access teacher or admin pages
 - Student overview loads classes
 - Student chart loads
@@ -684,7 +710,7 @@ If your MySQL root account has a password, add it to `DB_PASSWORD`.
 Import the database export or run:
 
 ```powershell
-C:\xampp\mysql\bin\mysql.exe -u root < server/schema.sql
+C:\xampp\mysql\bin\mysql.exe -u root -p -h 127.0.0.1 -P 3306 < server\attendance_db.sql
 ```
 
 ### Frontend login fails
